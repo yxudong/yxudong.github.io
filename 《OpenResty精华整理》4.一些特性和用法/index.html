@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="SO8jlY8yDJsvenFPB1vGvI2P2UfX9ECKyIUYN7G5TU8">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yxudong.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"buttons","active":"valine","storage":true,"lazyload":true,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一些特性和用法同步非阻塞               非阻塞调用                  非阻塞调用下的同步和异步    除了 ngx.timer 等少数异步操作外，使用 OpenResty 只需要编写同步的代码就可以，而不需要类似 Nginx 源码那样编写很多异步的代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《OpenResty精华整理》4.一些特性和用法">
+<meta property="og:url" content="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B4.%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95/index.html">
+<meta property="og:site_name" content="Yxd&#39;s Blog">
+<meta property="og:description" content="一些特性和用法同步非阻塞               非阻塞调用                  非阻塞调用下的同步和异步    除了 ngx.timer 等少数异步操作外，使用 OpenResty 只需要编写同步的代码就可以，而不需要类似 Nginx 源码那样编写很多异步的代码。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B0%83%E7%94%A8.png">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B0%83%E7%94%A8%E4%B8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5.png">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/resty%20%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%841.png">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/resty%20%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%842.png">
+<meta property="article:published_time" content="2021-05-08T06:24:44.000Z">
+<meta property="article:modified_time" content="2021-05-08T06:24:09.747Z">
+<meta property="article:author" content="Yxd">
+<meta property="article:tag" content="OpenResty">
+<meta property="article:tag" content="OpenResty精华整理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B0%83%E7%94%A8.png">
+
+<link rel="canonical" href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B4.%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《OpenResty精华整理》4.一些特性和用法 | Yxd's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yxd's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">个人博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B4.%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yxd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yxd's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《OpenResty精华整理》4.一些特性和用法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-08 14:24:44 / 修改时间：14:24:09" itemprop="dateCreated datePublished" datetime="2021-05-08T14:24:44+08:00">2021-05-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenResty/" itemprop="url" rel="index"><span itemprop="name">OpenResty</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B4.%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B4.%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="一些特性和用法"><a href="#一些特性和用法" class="headerlink" title="一些特性和用法"></a>一些特性和用法</h1><h2 id="同步非阻塞"><a href="#同步非阻塞" class="headerlink" title="同步非阻塞"></a>同步非阻塞</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B0%83%E7%94%A8.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">非阻塞调用</div>
+</center>
+
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B0%83%E7%94%A8%E4%B8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">非阻塞调用下的同步和异步</div>
+</center>
+
+<br/>
+除了 ngx.timer 等少数异步操作外，使用 OpenResty 只需要编写同步的代码就可以，而不需要类似 Nginx 源码那样编写很多异步的代码。
+
+<span id="more"></span>
+
+<h2 id="文档格式一致"><a href="#文档格式一致" class="headerlink" title="文档格式一致"></a>文档格式一致</h2><p>/t 目录，它里面就是所有的测试案例</p>
+<center class="half">
+    <img data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/resty%20%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%841.png" width="400"/>
+    <img data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/resty%20%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%842.png" width="400"/>
+</center>
+
+<h2 id="shared-dict"><a href="#shared-dict" class="headerlink" title="shared dict"></a>shared dict</h2><p>shared dict 可以完成 worker 间的数据共享，并借此实现 worker 之间的通信</p>
+<h2 id="lua-nginx-module-vs-lua-resty-core"><a href="#lua-nginx-module-vs-lua-resty-core" class="headerlink" title="lua-nginx-module vs lua-resty-core"></a>lua-nginx-module vs lua-resty-core</h2><p>对于 OpenResty 的实现，可能大部分的认识都是 OpenResty 是基于 lua-nginx-module 实现的，而不知道 lua-resty-core 这个项目，实际上，官方后续的计划便是把越来越多的功能采用 lua-resty-core 重新实现。</p>
+<p>在核心的 lua-nginx-module 中，调用 C 函数的 API，都是使用 Lua C API 来完成的；</p>
+<p>而在 lua-resty-core 中，则是把 lua-nginx-module 已有的部分 API，使用 FFI 的模式重新实现了一遍。</p>
+<p>如果比较关注 <a target="_blank" rel="noopener" href="http://openresty.org/en/changelog-1019003.html">OpenResty 新版特性</a> 的话，可以发现一些关于 lua-resty-core 的说明，比如基于 lua-resty-core 实现了更多的功能等等，都是基于这个目的，至于原因下面会讲到。</p>
+<p>需要澄清下，lua-nginx-module 提供的 API，是通过 C 实现，并通过 Lua CFunction 暴露出来的。</p>
+<p>而 lua-resty-core 提供的 API，也不是表面看上去那样用 Lua 实现的，是通过在 lua-nginx-module 里面的以 <em><em>lua_ffi</em></em> 形式命名的 C 函数实现的，并在 lua-resty-core 里面通过 LuaJIT FFI 暴露出来的。</p>
+<p>所以其实两者都是 C 实现。两者的比较，应该是 Lua CFunction 和 LuaJIT FFI 的比较。</p>
+<h3 id="Lua-CFunction"><a href="#Lua-CFunction" class="headerlink" title="Lua CFunction"></a>Lua CFunction</h3><p>以 ngx.base64_decode 举例，lua-nginx-module 实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">static int</span><br><span class="line"> ngx_http_lua_ngx_decode_base64(lua_State *L)</span><br><span class="line"> &#123;</span><br><span class="line">     ngx_str_t p, src;</span><br><span class="line"> </span><br><span class="line">    src.data &#x3D; (u_char *) luaL_checklstring(L, 1, &amp;src.len);</span><br><span class="line"> </span><br><span class="line">     p.len &#x3D; ngx_base64_decoded_length(src.len);</span><br><span class="line"> </span><br><span class="line">     p.data &#x3D; lua_newuserdata(L, p.len);</span><br><span class="line"> </span><br><span class="line">     if (ngx_decode_base64(&amp;p, &amp;src) &#x3D;&#x3D; NGX_OK) &#123;</span><br><span class="line">         lua_pushlstring(L, (char *) p.data, p.len);</span><br><span class="line"> </span><br><span class="line">     &#125; else &#123;</span><br><span class="line">         lua_pushnil(L);</span><br><span class="line">     &#125;</span><br><span class="line"> </span><br><span class="line">     return 1;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 C 编写的函数，无法把返回值传给 Lua 代码，而是需要通过栈，来传递 Lua 和 C 之间的调用参数和返回值。</p>
+<p>同时，这些代码也不能被 JIT 跟踪到，所以对于 LuaJIT 而言，这些操作是处于黑盒中的，没法进行优化。</p>
+<h3 id="LuaJIT-FFI"><a href="#LuaJIT-FFI" class="headerlink" title="LuaJIT FFI"></a>LuaJIT FFI</h3><p>FFI 的交互部分是用 Lua 实现的，这部分代码可以被 JIT 跟踪到，并进行优化；<br>当然，代码也会更加简洁易懂。</p>
+<p>以 ngx.base64_decode 举例，lua-resty-core 实现 <a target="_blank" rel="noopener" href="https://github.com/openresty/lua-resty-core/blob/master/lib/resty/core/base64.lua#L60">https://github.com/openresty/lua-resty-core/blob/master/lib/resty/core/base64.lua#L60</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ngx.decode_base64 &#x3D; function (s)</span><br><span class="line">     local slen &#x3D; #s</span><br><span class="line">     local dlen &#x3D; base64_decoded_length(slen)</span><br><span class="line">     </span><br><span class="line">     local dst &#x3D; get_string_buf(dlen)</span><br><span class="line">     local pdlen &#x3D; get_size_ptr()</span><br><span class="line">     local ok &#x3D; C.ngx_http_lua_ffi_decode_base64(s, slen, dst, pdlen)</span><br><span class="line">     if ok &#x3D;&#x3D; 0 then</span><br><span class="line">         return nil</span><br><span class="line">     end</span><br><span class="line">     return ffi_string(dst, pdlen[0])</span><br><span class="line"> end</span><br></pre></td></tr></table></figure>
+
+<h3 id="值得说明的几个点"><a href="#值得说明的几个点" class="headerlink" title="值得说明的几个点"></a>值得说明的几个点</h3><ul>
+<li><p>FFI + JIT 在跟 C 领域频繁数据交互的领域才明显，例如：</p>
+<ul>
+<li>ngx.md5 相差不大</li>
+<li>ngx.ctx, ngx.re.find, ngx.time 效果相差几十倍</li>
+</ul>
+</li>
+<li><p>解释模式下 LuaJIT 的 FFI 操作很慢，比编译模式下慢十倍。<br>调用 Lua CFunction 会迫使 LuaJIT 退回到解释模式，而通过 FFI 调用 C 函数则不会。</p>
+</li>
+<li><p>除了不会打断 tracing，FFI 实现的版本还有另一个优势：LuaJIT 能够在编译时优化 FFI 实现代码。</p>
+</li>
+<li><p>在 OpenResty 2019 年 5 月份发布的 1.15.8.1 版本前，lua-resty-core 默认是不开启的，而这不仅会带来性能损失，更严重的是会造成潜在的 bug。</p>
+<p>强烈推荐还在使用历史版本的用户，都手动开启 lua-resty-core。只需要在 init_by_lua 阶段，增加一行代码就可以了：</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">require &quot;resty.core&quot;</span><br></pre></td></tr></table></figure>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.15.8.1 版本中，增加了 lua_load_resty_core 指令，可以选择开启或关闭加载 lua-resty-core（默认开启）。<br/><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.17.8.1 版本后，lua_load_resty_core 指令被废除，lua-resty-core 是强制加载的，这对于开源项目来说是一个很好的决定，在没有什么理由选择更糟糕的实现的时候，强制帮助用户选择好，防止给不熟悉的用户更多的疑惑性选择。</p>
+<ul>
+<li><p>OpenResty 中的函数都是有命名规范的，可以通过命名推测出它的用处。</p>
+<p>  比如：<br><br>  &ensp;&ensp;&ensp;&ensp;ngx_http_lua_ffi_ ，是用 FFI 来处理 NGINX HTTP 请求的 Lua 函数；<br><br>  &ensp;&ensp;&ensp;&ensp;ngx_http_lua_ngx_ ，是用 Cfunction 来处理 NGINX HTTP 请求的 Lua 函数；<br><br>  &ensp;&ensp;&ensp;&ensp;其他 ngx_ 和 lua_ 开头的函数，则分别属于 NGINX 和 Lua 的内置函数。</p>
+</li>
+</ul>
+<h2 id="ngx-ctx"><a href="#ngx-ctx" class="headerlink" title="ngx.ctx"></a>ngx.ctx</h2><p>ngx.ctx 可以在同一个请求的不同阶段之间共享数据。它其实就是一个普通的 Lua 的 table，所以速度很快，还可以存储各种 Lua 的对象。它的生命周期是请求级别的，当一个请求结束的时候，ngx.ctx 也会跟着被销毁掉。</p>
+<h2 id="定时任务"><a href="#定时任务" class="headerlink" title="定时任务"></a>定时任务</h2><p>ngx.timer.at，用来执行一次性的定时任务；<br>ngx.time.every，用来执行固定周期的定时任务。</p>
+<h2 id="特权进程"><a href="#特权进程" class="headerlink" title="特权进程"></a>特权进程</h2><p>我们都知道 Nginx 主要分为 master 进程和 worker 进程，其中，真正处理用户请求的是 worker 进程。</p>
+<p>而 OpenResty 在 Nginx 的基础上进行了扩展，增加了特权进程：privileged agent。</p>
+<p>特权进程很特别：</p>
+<ul>
+<li>它不监听任何端口，这就意味着不会对外提供任何服务；</li>
+<li>它拥有和 master 进程一样的权限，一般来说是 root 用户的权限，这就让它可以做很多 worker 进程不可能完成的任务；</li>
+<li>特权进程只能在 init_by_lua 上下文中开启；</li>
+<li>另外，特权进程只有运行在 init_worker_by_lua 上下文中才有意义，因为没有请求触发，也就不会走到content、access 等上下文去。</li>
+</ul>
+<p>开启特权进程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">init_by_lua_block &#123;</span><br><span class="line">    local process &#x3D; require &quot;ngx.process&quot;</span><br><span class="line"></span><br><span class="line">    local ok, err &#x3D; process.enable_privileged_agent()</span><br><span class="line">    if not ok then</span><br><span class="line">        ngx.log(ngx.ERR, &quot;enables privileged agent failed error:&quot;, err)</span><br><span class="line">    end</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nginx: master process</span><br><span class="line">nginx: worker process</span><br><span class="line">nginx: privileged agent process</span><br></pre></td></tr></table></figure>
+
+<h2 id="test-nginx"><a href="#test-nginx" class="headerlink" title="test::nginx"></a>test::nginx</h2><p>test::nginx 是 OpenResty 测试体系中的核心，OpenResty 本身和周边的 lua-rety 库，都是使用它来组织和编写测试集的。</p>
+<p>虽然它一个是测试框架，但它的门槛非常高。这是因为， test::nginx 和一般的测试框架不同，并非基于断言，也不使用 Lua 语言，这就要求开发者从零开始学习和使用 test::nginx，并得扭转自身对测试框架固有的认知。</p>
+<p>test::nginx 糅合了 Perl、数据驱动以及 DSL（领域小语言）。对于同一份测试案例集，通过对参数和环境变量的控制，可以实现乱序执行、多次重复、内存泄漏检测、压力测试等不同的效果。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yxd
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B4.%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95/" title="《OpenResty精华整理》4.一些特性和用法">https://yxudong.github.io/《OpenResty精华整理》4.一些特性和用法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/OpenResty/" rel="tag"><i class="fa fa-tag"></i> OpenResty</a>
+              <a href="/tags/OpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> OpenResty精华整理</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/" rel="prev" title="《OpenResty精华整理》5.需要注意的点">
+      <i class="fa fa-chevron-left"></i> 《OpenResty精华整理》5.需要注意的点
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B6.%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="next" title="《OpenResty精华整理》6.性能优化">
+      《OpenResty精华整理》6.性能优化 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">一些特性和用法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9E"><span class="nav-number">1.1.</span> <span class="nav-text">同步非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E6%A1%A3%E6%A0%BC%E5%BC%8F%E4%B8%80%E8%87%B4"><span class="nav-number">1.2.</span> <span class="nav-text">文档格式一致</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shared-dict"><span class="nav-number">1.3.</span> <span class="nav-text">shared dict</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lua-nginx-module-vs-lua-resty-core"><span class="nav-number">1.4.</span> <span class="nav-text">lua-nginx-module vs lua-resty-core</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Lua-CFunction"><span class="nav-number">1.4.1.</span> <span class="nav-text">Lua CFunction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LuaJIT-FFI"><span class="nav-number">1.4.2.</span> <span class="nav-text">LuaJIT FFI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%80%BC%E5%BE%97%E8%AF%B4%E6%98%8E%E7%9A%84%E5%87%A0%E4%B8%AA%E7%82%B9"><span class="nav-number">1.4.3.</span> <span class="nav-text">值得说明的几个点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ngx-ctx"><span class="nav-number">1.5.</span> <span class="nav-text">ngx.ctx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="nav-number">1.6.</span> <span class="nav-text">定时任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E6%9D%83%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.7.</span> <span class="nav-text">特权进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#test-nginx"><span class="nav-number">1.8.</span> <span class="nav-text">test::nginx</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yxd"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yxd</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yxudong" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yxudong" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/yxd_Joshua" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;yxd_Joshua" rel="noopener" target="_blank"><i class="fab fa-douban fa-fw"></i>豆瓣</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/yang-xu-dong-87" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;yang-xu-dong-87" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>知乎</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://space.bilibili.com/17864348" title="Bilibili → https:&#x2F;&#x2F;space.bilibili.com&#x2F;17864348" rel="noopener" target="_blank"><i class="fab fa-bilibili fa-fw"></i>Bilibili</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yxd</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'QaqlJI7mSHOIkkOgTK0xS3pm-gzGzoHsz',
+      appKey     : 'FRspuPCpiKqjmQnxflyLyPMH',
+      placeholder: "请在此输入您的留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+  
+  
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+  <script src="/lib/live2d-widget/autoload.js"></script>
+</body>
+</html>

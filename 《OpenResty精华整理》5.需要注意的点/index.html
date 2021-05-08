@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="SO8jlY8yDJsvenFPB1vGvI2P2UfX9ECKyIUYN7G5TU8">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yxudong.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"buttons","active":"valine","storage":true,"lazyload":true,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="需要注意的点时间 API返回当前时间的 API，如果没有非阻塞网络 IO 操作来触发，便会一直返回缓存的值，而不是像我们想的那样，能够返回当前的实时时间。 123$ resty -e &#39;ngx.say(ngx.now())os.execute(&quot;sleep 1&quot;)ngx.say(ngx.now())&#39;  在两次调用 ngx.now 之间，使用 Lua 的阻塞函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《OpenResty精华整理》5.需要注意的点">
+<meta property="og:url" content="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/index.html">
+<meta property="og:site_name" content="Yxd&#39;s Blog">
+<meta property="og:description" content="需要注意的点时间 API返回当前时间的 API，如果没有非阻塞网络 IO 操作来触发，便会一直返回缓存的值，而不是像我们想的那样，能够返回当前的实时时间。 123$ resty -e &#39;ngx.say(ngx.now())os.execute(&quot;sleep 1&quot;)ngx.say(ngx.now())&#39;  在两次调用 ngx.now 之间，使用 Lua 的阻塞函数">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-08T06:24:44.000Z">
+<meta property="article:modified_time" content="2021-05-08T06:26:08.035Z">
+<meta property="article:author" content="Yxd">
+<meta property="article:tag" content="OpenResty">
+<meta property="article:tag" content="OpenResty精华整理">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《OpenResty精华整理》5.需要注意的点 | Yxd's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yxd's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">个人博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yxd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yxd's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《OpenResty精华整理》5.需要注意的点
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-08 14:24:44 / 修改时间：14:26:08" itemprop="dateCreated datePublished" datetime="2021-05-08T14:24:44+08:00">2021-05-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenResty/" itemprop="url" rel="index"><span itemprop="name">OpenResty</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="需要注意的点"><a href="#需要注意的点" class="headerlink" title="需要注意的点"></a>需要注意的点</h1><h2 id="时间-API"><a href="#时间-API" class="headerlink" title="时间 API"></a>时间 API</h2><p>返回当前时间的 API，如果没有非阻塞网络 IO 操作来触发，便会一直返回缓存的值，而不是像我们想的那样，能够返回当前的实时时间。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ resty -e &#39;ngx.say(ngx.now())</span><br><span class="line">os.execute(&quot;sleep 1&quot;)</span><br><span class="line">ngx.say(ngx.now())&#39;</span><br></pre></td></tr></table></figure>
+
+<p>在两次调用 ngx.now 之间，使用 Lua 的阻塞函数 sleep 了 1 秒钟，但从打印的结果来看，这两次返回的时间戳却是一模一样的。<br>如果换成是非阻塞的 sleep 函数，它就会打印出不同的时间戳了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ resty -e &#39;ngx.say(ngx.now())</span><br><span class="line">ngx.sleep(1)</span><br><span class="line">ngx.say(ngx.now())&#39;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h2 id="json-编码时无法区分-array-和-dict"><a href="#json-编码时无法区分-array-和-dict" class="headerlink" title="json 编码时无法区分 array 和 dict"></a>json 编码时无法区分 array 和 dict</h2><p>json 对空 table 编码的时候，无法确定编码为数组还是字典。</p>
+<p>OpenResty 的 cjson 库，默认把空 table 当做字典来编码。我们可以通过 encode_empty_table_as_object 这个函数，来修改这个全局的默认值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">resty -e &#39;local cjson &#x3D; require &quot;cjson&quot;</span><br><span class="line">cjson.encode_empty_table_as_object(false)</span><br><span class="line">local t &#x3D; &#123;&#125;</span><br><span class="line">print(cjson.encode(t))&#39;</span><br></pre></td></tr></table></figure>
+
+<p>全局这种设置的影响面比较大，可以指定某个 table 的编码规则：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">resty -e &#39;local cjson &#x3D; require &quot;cjson&quot;</span><br><span class="line">local t &#x3D; &#123;&#125;</span><br><span class="line">setmetatable(t, cjson.empty_array_mt)</span><br><span class="line">print(cjson.encode(t))</span><br><span class="line">t &#x3D; &#123;123&#125;</span><br><span class="line">print(cjson.encode(t))&#39;</span><br></pre></td></tr></table></figure>
+
+<h2 id="真值和空值"><a href="#真值和空值" class="headerlink" title="真值和空值"></a>真值和空值</h2><h3 id="ngx-null"><a href="#ngx-null" class="headerlink" title="ngx.null"></a>ngx.null</h3><p>因为 Lua 的 nil 无法作为 table 的 value，所以 OpenResty 引入了 ngx.null，作为 table 中的空值。<br>只有 nil 和 false 是假值，ngx.null 的布尔值为真。如果遗漏了这一点，就很容易踩坑，比如在使用 lua-resty-redis 的时候，做了下面这个判断：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">local res, err &#x3D; red:get(&quot;dog&quot;)</span><br><span class="line">if not res then</span><br><span class="line">    res &#x3D; res + &quot;test&quot;</span><br><span class="line">end </span><br></pre></td></tr></table></figure>
+
+<p>在 dog 这个 key 不存在的情况下，这段代码就 500 崩溃了。</p>
+<h3 id="cdata-NULL"><a href="#cdata-NULL" class="headerlink" title="cdata:NULL"></a>cdata:NULL</h3><p>当通过 LuaJIT FFI 接口去调用 C 函数，而这个函数返回一个 NULL 指针，那么就会遇到另外一种空值，即 cdata:NULL 。<br>和 ngx.null 一样，cdata:NULL 也是真值。但下面这段代码，会打印出 true，也就是说 cdata:NULL 是和 nil 相等的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ resty -e &#39;local ffi &#x3D; require &quot;ffi&quot;</span><br><span class="line">local cdata_null &#x3D; ffi.new(&quot;void*&quot;, nil)</span><br><span class="line">ngx.say(cdata_null &#x3D;&#x3D; nil)&#39;</span><br></pre></td></tr></table></figure>
+
+<h3 id="cjson-null"><a href="#cjson-null" class="headerlink" title="cjson.null"></a>cjson.null</h3><p>Lua 中的 nil，被 json encode 和 decode 一圈儿之后，就变成了 cjson.null。它引入的原因和 ngx.null 是一样的，因为 nil 无法在 table 中作为 value。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ resty -e &#39;local cjson &#x3D; require &quot;cjson&quot;</span><br><span class="line">local data &#x3D; cjson.encode(nil)</span><br><span class="line">local decode_null &#x3D; cjson.decode(data)</span><br><span class="line">ngx.say(decode_null &#x3D;&#x3D; cjson.null)&#39;</span><br></pre></td></tr></table></figure>
+
+<h3 id="变量的个数限制"><a href="#变量的个数限制" class="headerlink" title="变量的个数限制"></a>变量的个数限制</h3><p>Lua 中，一个函数的局部变量的个数，和 upvalue 的个数都是有上限的，你可以从 Lua 的源码中得到印证：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*</span><br><span class="line">@@ LUAI_MAXVARS is the maximum number of local variables per function</span><br><span class="line">@* (must be smaller than 250).</span><br><span class="line">*&#x2F;</span><br><span class="line">#define LUAI_MAXVARS 200</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;*</span><br><span class="line">@@ LUAI_MAXUPVALUES is the maximum number of upvalues per function</span><br><span class="line">@* (must be smaller than 250).</span><br><span class="line">*&#x2F;</span><br><span class="line">#define LUAI_MAXUPVALUES 60</span><br></pre></td></tr></table></figure>
+
+<p>这两个阈值，分别被硬编码为 200 和 60。虽说你可以手动修改源码来调整这两个值，不过最大也只能设置为 250。</p>
+<p>一般情况下，我们不会超过这个阈值，但写 OpenResty 代码的时候，还是要留意这个事情，不要过多地使用局部变量和 upvalue，而是要尽可能地使用 do .. end 做一层封装，来减少局部变量和 upvalue 的个数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">local re_find &#x3D; ngx.re.find</span><br><span class="line">function foo()</span><br><span class="line">    ...</span><br><span class="line">end</span><br><span class="line">function bar()</span><br><span class="line">    ...</span><br><span class="line">end</span><br><span class="line">function fn()</span><br><span class="line">    ...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<p>如果只有函数 foo 使用到了 re_find， 可以这样改造下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">do</span><br><span class="line">    local re_find &#x3D; ngx.re.find</span><br><span class="line">    function foo()</span><br><span class="line">        ...</span><br><span class="line">    end</span><br><span class="line">end</span><br><span class="line">function bar()</span><br><span class="line">    ...</span><br><span class="line">end</span><br><span class="line">function fn()</span><br><span class="line">    ...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<p>这样一来，在 main 函数的层面上，就少了 re_find 这个局部变量。这在单个的大的 Lua 文件中，算是一个优化技巧。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yxd
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/" title="《OpenResty精华整理》5.需要注意的点">https://yxudong.github.io/《OpenResty精华整理》5.需要注意的点/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/OpenResty/" rel="tag"><i class="fa fa-tag"></i> OpenResty</a>
+              <a href="/tags/OpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> OpenResty精华整理</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B3.OpenResty%20%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%8E%9F%E5%9B%A0/" rel="prev" title="《OpenResty精华整理》3.OpenResty 高性能的原因">
+      <i class="fa fa-chevron-left"></i> 《OpenResty精华整理》3.OpenResty 高性能的原因
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B4.%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95/" rel="next" title="《OpenResty精华整理》4.一些特性和用法">
+      《OpenResty精华整理》4.一些特性和用法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">需要注意的点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4-API"><span class="nav-number">1.1.</span> <span class="nav-text">时间 API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#json-%E7%BC%96%E7%A0%81%E6%97%B6%E6%97%A0%E6%B3%95%E5%8C%BA%E5%88%86-array-%E5%92%8C-dict"><span class="nav-number">1.2.</span> <span class="nav-text">json 编码时无法区分 array 和 dict</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%9F%E5%80%BC%E5%92%8C%E7%A9%BA%E5%80%BC"><span class="nav-number">1.3.</span> <span class="nav-text">真值和空值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ngx-null"><span class="nav-number">1.3.1.</span> <span class="nav-text">ngx.null</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cdata-NULL"><span class="nav-number">1.3.2.</span> <span class="nav-text">cdata:NULL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cjson-null"><span class="nav-number">1.3.3.</span> <span class="nav-text">cjson.null</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E7%9A%84%E4%B8%AA%E6%95%B0%E9%99%90%E5%88%B6"><span class="nav-number">1.3.4.</span> <span class="nav-text">变量的个数限制</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yxd"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yxd</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yxudong" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yxudong" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/yxd_Joshua" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;yxd_Joshua" rel="noopener" target="_blank"><i class="fab fa-douban fa-fw"></i>豆瓣</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/yang-xu-dong-87" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;yang-xu-dong-87" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>知乎</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://space.bilibili.com/17864348" title="Bilibili → https:&#x2F;&#x2F;space.bilibili.com&#x2F;17864348" rel="noopener" target="_blank"><i class="fab fa-bilibili fa-fw"></i>Bilibili</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yxd</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'QaqlJI7mSHOIkkOgTK0xS3pm-gzGzoHsz',
+      appKey     : 'FRspuPCpiKqjmQnxflyLyPMH',
+      placeholder: "请在此输入您的留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+  
+  
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+  <script src="/lib/live2d-widget/autoload.js"></script>
+</body>
+</html>

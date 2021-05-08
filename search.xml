@@ -1096,7 +1096,7 @@ LFU 算法相比 LRU，在某些情况下可以提升 数据命中率，使用�
         <category>Redis</category>
       </categories>
       <tags>
-        <tag>Redis</tag>
+        <tag>Redis，面试</tag>
       </tags>
   </entry>
   <entry>
@@ -1242,7 +1242,7 @@ Redis Cluster 并不能保证数据的强一致性，在实际中集群在特定
         <category>Redis</category>
       </categories>
       <tags>
-        <tag>Redis</tag>
+        <tag>Redis，面试</tag>
       </tags>
   </entry>
   <entry>
@@ -1518,7 +1518,7 @@ bgsave 子进程运行后，开始读取主线程的内存数据，并把它们�
         <category>Redis</category>
       </categories>
       <tags>
-        <tag>Redis</tag>
+        <tag>Redis，面试</tag>
       </tags>
   </entry>
   <entry>
@@ -1604,6 +1604,830 @@ bgsave 子进程运行后，开始读取主线程的内存数据，并把它们�
       <tags>
         <tag>OpenResty</tag>
         <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《OpenResty精华整理》1.安装后的目录结构以及 GitHub 项目概览</title>
+    <url>/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B1.%E5%AE%89%E8%A3%85%E5%90%8E%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E4%BB%A5%E5%8F%8A%20GitHub%20%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%A7%88/</url>
+    <content><![CDATA[<h1 id="OpenResty-的发展"><a href="#OpenResty-的发展" class="headerlink" title="OpenResty 的发展"></a>OpenResty 的发展</h1><p>OpenResty 并不像其他的开发语言一样从零开始搭建，而是基于成熟的开源组件——NGINX 和 LuaJIT。</p>
+<p>OpenResty 诞生于 2007 年，不过，它的第一个版本并没有选择 Lua，而是用了 Perl，这跟作者章亦春的技术偏好有很大关系。</p>
+<p>但 Perl 的性能远远不能达到要求，于是，在第二个版本中，Perl 就被 Lua 给替换了。</p>
+<p>不过，在 OpenResty 官方的项目中，Perl 依然占据着重要的角色，OpenResty 工程化方面都是用 Perl 来构建，比如测试框架、Linter、CLI 等。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E7%9A%84%E4%B8%BB%E8%A6%81%E7%BB%84%E6%88%90.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 的主要组成</div>
+</center>
+
+<span id="more"></span>
+
+<h1 id="OpenResty-安装后的目录结构"><a href="#OpenResty-安装后的目录结构" class="headerlink" title="OpenResty 安装后的目录结构"></a>OpenResty 安装后的目录结构</h1><p>安装后主要包含了 bin、luajit、lualib、nginx、pod 这几个子目录</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E5%AE%89%E8%A3%85%E5%90%8E%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 安装后的目录结构</div>
+</center>
+
+<h2 id="bin"><a href="#bin" class="headerlink" title="bin"></a>bin</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/bin%20%E7%9B%AE%E5%BD%95.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">bin 目录</div>
+</center>
+
+<p>openresty，它其实是 nginx 的一个软链接。</p>
+<p>opm 是包管理工具，可以通过它来管理各类第三方包。</p>
+<p>resty 是 OpenResty CLI，安装完 OpenResty 后，会默认安装。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/resty%20%E7%A4%BA%E4%BE%8B.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">resty 示例</div>
+</center>
+
+<p>restydoc 可以查看帮助文档。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/restydoc%20%E7%A4%BA%E4%BE%8B.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">restydoc 示例</div>
+</center>
+
+<p>目录里面其他的一些工具，和 resty 一样，都是 Perl 脚本。</p>
+<h2 id="pod"><a href="#pod" class="headerlink" title="pod"></a>pod</h2><p>pod 是 Perl 里面的一种标记语言，用于给 Perl 的模块编写文档。<br>pod 目录中存放的就是 OpenResty、 NGINX、lua-resty-*、LuaJIT 的文档， 和刚才提到的 restydoc 联系在一起。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/pod%20%E7%9B%AE%E5%BD%95.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">pod 目录</div>
+</center>
+
+<h2 id="nginx-和-luajit"><a href="#nginx-和-luajit" class="headerlink" title="nginx 和 luajit"></a>nginx 和 luajit</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/nginx%20%E5%92%8C%20luajit%20%E7%9B%AE%E5%BD%95.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">nginx 和 luajit 目录</div>
+</center>
+
+<br/>
+主要存放 NGINX 和 LuaJIT 的可执行文件和依赖，是 OpenResty 的基石。
+
+<p>早期的 OpenResty 同时带有 Lua 和 LuaJIT，可以通过编译选项，来决定使用 Lua 还是 LuaJIT。</p>
+<p>不过到了现在，Lua 逐渐被淘汰，就只支持更高性能的 LuaJIT 了。</p>
+<h2 id="lualib"><a href="#lualib" class="headerlink" title="lualib"></a>lualib</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/lualib%20%E7%9B%AE%E5%BD%95.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">lualib 目录</div>
+</center>
+
+<br/>
+里面存放的是 OpenResty 中使用到的 Lua 库，主要分为 ngx 和 resty 两个子目录。
+
+<p>前者存放的是 lua-resty-core 这个官方项目中的 Lua 代码，里面都是基于 FFI 重新实现的 OpenResty API。</p>
+<p>resty 目录中存放的则是各种 lua-resty-* 项目包含的 Lua 代码。</p>
+<h1 id="OpenResty-GitHub-项目概览"><a href="#OpenResty-GitHub-项目概览" class="headerlink" title="OpenResty GitHub 项目概览"></a>OpenResty GitHub 项目概览</h1><p>OpenResty 在 GitHub 的项目主页：<a href="https://github.com/openresty/">openresty</a></p>
+<p>大概分为以下 7 类：</p>
+<h2 id="NGINX-C-模块"><a href="#NGINX-C-模块" class="headerlink" title="NGINX C 模块"></a>NGINX C 模块</h2><p>OpenResty 的项目命名都是有规范的，以 *-nginx-module命名的就是 NGINX 的 C 模块。<br>openresty -V 中，可以看到这些 C 模块</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/openresty%20-V.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">openresty -V</div>
+</center>
+
+<br/>
+--add-module=后面跟着的，就是 OpenResty 的 C 模块。其中，最核心的就是 lua-nginx-module 和 stream-lua-nginx-module，前者用来处理七层流量，后者用来处理四层流量。
+
+<p>这些 C 模块中，有些是需要特别注意的，虽然默认编译进入了 OpenResty，但并不推荐使用。<br>比如 redis2-nginx-module、redis-nginx-module 和 memc-nginx-module，它们是用来和 redis 以及 memcached 交互使用的。<br>这些 C 库是 OpenResty 早期推荐使用的，但在 cosocket 功能加入之后，它们都已经被 lua-resty-redis 和 lua-resty-memcached 替代，处于疏于维护的状态。<br>OpenResty 后面也不会开发更多的 NGINX C 库，而是专注在基于 cosocket 的 Lua 库上，后者才是未来。</p>
+<h2 id="lua-resty-周边库"><a href="#lua-resty-周边库" class="headerlink" title="lua-resty- 周边库"></a>lua-resty- 周边库</h2><p>官方自带<br>在 OpenResty 世界中，如果使用 cosocket 实现了一个包，那么就要使用 lua-resty- 这个前缀，算是一个不成文的规定。</p>
+<p>除了官方自带的之外，还有更多的第三方库。</p>
+<h2 id="自己维护的-LuaJIT-分支"><a href="#自己维护的-LuaJIT-分支" class="headerlink" title="自己维护的 LuaJIT 分支"></a>自己维护的 LuaJIT 分支</h2><p>OpenResty 除了维护自己的 OpenSSL patch 外，还维护了自己的 LuaJIT 分支。<br>在 2015 年，LuaJIT 的作者 Mike Pall 宣布退休，寻找新的 LuaJIT 维护者，但 Mike 并没有找到合适的维护者，他现在主要是做 bugfix 的维护工作，新功能的开发也已经暂停，所以 OpenResty 维护着自己的 LuaJIT 分支。<br>相对于 Lua，LuaJIT 增加了不少独有的函数，这些函数非常重要</p>
+<h2 id="测试框架"><a href="#测试框架" class="headerlink" title="测试框架"></a>测试框架</h2><p>OpenResty 的测试框架是test-nginx，同样也是用 Perl 语言来开发的，从名字上就能看出来，它是专门用来测试 NGINX 相关的项目。<br>OpenResty 官方的所有 C 模块和 lua-resty 库的测试案例，都是由 test-nginx 驱动的。</p>
+<h2 id="调试工具链"><a href="#调试工具链" class="headerlink" title="调试工具链"></a>调试工具链</h2><p>OpenResty 项目在如何科学和动态地调试代码上，花费了大量的精力。</p>
+<p>OpenResty 的作者章亦春专门写了一篇文章，来介绍动态追踪技术。<br>强烈推荐，看完也有助于理解对应的工具链以及系统性能优化 <a href="https://blog.openresty.com.cn/cn/dynamic-tracing/#fnref2">动态追踪技术漫谈</a>。</p>
+<p>openresty-systemtap-toolkit 和 stapxx 这两个 OpenResty 的项目，都基于 systemtap 这个动态调试和追踪工具。</p>
+<p>使用 systemtap 最大的优势，便是实现活体分析，同时对目标程序完全无侵入。<br>打个比方，systemtap，就像是我们去医院照了个 CT，无痛无感知。更棒的是，systemtap 可以生成直观的火焰图来做性能分析，这里先放一个火焰图，直观上有个感性的认识。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E7%81%AB%E7%84%B0%E5%9B%BE.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">火焰图</div>
+</center>
+
+<h2 id="打包相关"><a href="#打包相关" class="headerlink" title="打包相关"></a>打包相关</h2><p>OpenResty 在不同发行操作系统（比如 CentOS、Ubuntu、MacOS 等）版本中的打包脚本</p>
+<h2 id="工程化工具"><a href="#工程化工具" class="headerlink" title="工程化工具"></a>工程化工具</h2><p>比如 openresty-devel-utils 就是开发 OpenResty 和 NGINX 的工具集。它们也都使用 Perl 开发，其中大部分的工具都是没有文档的。<br>但对于 OpenResty 的开发者来说，这些工具又是非常有用的。</p>
+<p>lj-releng 是一个简单有效的 LuaJIT 代码检测工具，类似 luacheck，可以找出全局变量等潜在的问题。</p>
+]]></content>
+      <categories>
+        <category>OpenResty</category>
+      </categories>
+      <tags>
+        <tag>OpenResty</tag>
+        <tag>OpenResty精华整理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《OpenResty精华整理》3.OpenResty 高性能的原因</title>
+    <url>/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B3.OpenResty%20%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%8E%9F%E5%9B%A0/</url>
+    <content><![CDATA[<h1 id="OpenResty-高性能的原因"><a href="#OpenResty-高性能的原因" class="headerlink" title="OpenResty 高性能的原因"></a>OpenResty 高性能的原因</h1><h2 id="运行在-Nginx-整体架构之上"><a href="#运行在-Nginx-整体架构之上" class="headerlink" title="运行在 Nginx 整体架构之上"></a>运行在 Nginx 整体架构之上</h2><p>OpenResty 的 master 和 worker 进程中，都包含一个 LuaJIT VM。在同一个进程内的所有协程，都会共享这个 VM，并在这个 VM 中运行 Lua 代码。</p>
+<p>而在同一个时间点上，每个 worker 进程只能处理一个用户的请求，也就是只有一个协程在运行。</p>
+<p>NGINX 实际上是通过 epoll 的事件驱动，来减少等待和空转，才尽可能地让 CPU 资源都用于处理用户的请求。<br>毕竟，只有单个的请求被足够快地处理完，整体才能达到高性能的目的。<br>如果采用的是多线程模式，让一个请求对应一个线程，那么在 C10K 的情况下，资源很容易就会被耗尽的。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E5%92%8C%20LuaJit%20%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 和 LuaJit 架构图</div>
+</center>
+
+<span id="more"></span>
+
+<h2 id="cosocket"><a href="#cosocket" class="headerlink" title="cosocket"></a>cosocket</h2><p>是 OpenResty 的核心和精髓。</p>
+<p>在早期的 OpenResty 版本中，如果想要去与 Redis、memcached 这些服务交互的话，需要使用 redis2-nginx-module、redis-nginx-module 和 memc-nginx-module这些 C 模块。</p>
+<p>这些模块至今仍然在 OpenResty 的发行包中。不过，cosocket 功能加入以后，它们都已经被 lua-resty-redis 和 lua-resty-memcached 替代，基本上没人再去使用 C 模块连接外部服务了。</p>
+<p>实际上，cosocket 是 OpenResty 中的专有名词，是把协程和网络套接字的英文拼在一起形成的，即 cosocket = coroutine + socket。</p>
+<p>cosocket 是各种 lua-resty-* 非阻塞库的基础，没有 cosocket，开发者就无法用 Lua 来快速连接各种外部的网络服务。</p>
+<p>cosocket 不仅需要 Lua 协程特性的支持，也需要 Nginx 中非常重要的事件机制的支持，这两者结合在一起，最终实现了非阻塞网络 I/O。</p>
+<p>如果我们在 OpenResty 中调用一个 cosocket 相关函数，内部实现便是下面这张图的样子：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/cosocket%20%E5%87%BD%E6%95%B0%E6%B5%81%E7%A8%8B.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">cosocket 函数流程</div>
+</center>
+
+<br/>
+遇到网络 I/O 时，它会交出控制权（yield），把网络事件注册到 Nginx 监听列表中，并把权限交给 Nginx；当有 Nginx 事件达到触发条件时，便唤醒对应的协程继续处理（resume）。
+
+<h3 id="cosocket-API-和指令简介"><a href="#cosocket-API-和指令简介" class="headerlink" title="cosocket API 和指令简介"></a>cosocket API 和指令简介</h3><ul>
+<li>创建对象：ngx.socket.tcp。</li>
+<li>设置超时：tcpsock:settimeout 和 tcpsock:settimeouts。</li>
+<li>建立连接：tcpsock:connect。</li>
+<li>发送数据：tcpsock:send。</li>
+<li>接受数据：tcpsock:receive、tcpsock:receiveany 和 tcpsock:receiveuntil。</li>
+<li>连接池：tcpsock:setkeepalive。</li>
+<li>关闭连接：tcpsock:close。</li>
+</ul>
+<p>这些 API 可以使用的上下文：<br/><br>rewrite_by_lua*, access_by_lua*, content_by_lua*, ngx.timer.<em>, ssl_certificate_by_lua</em>, ssl_session_fetch_by_lua*_<br>在某些阶段是不能使用的，比如 init_by_lua，log_by_lua*，参考 <a href="https://github.com/openresty/lua-nginx-module#cosockets-not-available-everywhere">Cosockets Not Available Everywhere</a></p>
+<h2 id="LuaJit"><a href="#LuaJit" class="headerlink" title="LuaJit"></a>LuaJit</h2><p>通过 tracing 对热代码进行编译。</p>
+<h3 id="LuaJIT-在-OpenResty-整体架构中的位置"><a href="#LuaJIT-在-OpenResty-整体架构中的位置" class="headerlink" title="LuaJIT 在 OpenResty 整体架构中的位置"></a>LuaJIT 在 OpenResty 整体架构中的位置</h3><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/luajit%20%E5%9C%A8%20openresty%20%E6%9E%B6%E6%9E%84%E4%B8%AD%E4%BD%8D%E7%BD%AE.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">LuaJIT 在 OpenResty 整体架构中的位置</div>
+</center>
+<br/>
+
+<p>OpenResty 的 worker 进程都是 fork master 进程而得到的，master 进程中的 LuaJIT 虚拟机也会一起 fork 过来。</p>
+<p>在同一个 worker 内的所有协程，都会共享这个 LuaJIT 虚拟机，Lua 代码的执行也是在这个虚拟机中完成的。</p>
+<h3 id="LuaJIT-vs-Lua"><a href="#LuaJIT-vs-Lua" class="headerlink" title="LuaJIT vs Lua"></a>LuaJIT vs Lua</h3><p>标准 Lua 和 LuaJIT 是两回事儿，LuaJIT 只是兼容了 Lua 5.1 的语法。</p>
+<p>在 OpenResty 中，可以用 Lua C API 来调用 C 函数，还可以在 LuaJIT 中使用 FFI。</p>
+<h4 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h4><p>其实标准 Lua 出于性能考虑，也内置了虚拟机 （Lua VM），所以 Lua 代码并不是直接被解释执行的，而是先由 Lua 编译器编译为字节码（Byte Code），然后再由 Lua 虚拟机执行。</p>
+<p>而 LuaJIT 的运行时环境，除了一个汇编实现的 Lua 解释器外，还有一个可以直接生成机器代码的 JIT 编译器。</p>
+<p>开始的时候，LuaJIT 和标准 Lua 一样，Lua 代码被编译为字节码，字节码被 LuaJIT 的解释器解释执行。<br>但不同的是，LuaJIT 的解释器会在执行字节码的同时，记录一些运行时的统计信息，当这些次数超过某个随机的阈值时，便认为对应的 Lua 函数入口或者对应的 Lua 循环足够热，这时便会触发 JIT 编译器开始工作。<br>编译的过程，是把 LuaJIT 字节码先转换成 LuaJIT 自己定义的中间码（IR），然后再生成针对目标体系结构的机器码。</p>
+<p>所以，所谓 LuaJIT 的性能优化，本质上就是让尽可能多的 Lua 代码可以被 JIT 编译器生成机器码，而不是回退到 Lua 解释器的解释执行模式。</p>
+<h4 id="FFI"><a href="#FFI" class="headerlink" title="FFI"></a>FFI</h4><p>除了兼容 Lua 5.1 的语法并支持 JIT 外，LuaJIT 还紧密结合了 FFI（Foreign Function Interface），可以直接在 Lua 代码中调用外部的 C 函数和使用 C 的数据结构。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/test_ffi.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">test_ffi</div>
+</center>
+
+<br/>
+类似的，我们可以用 FFI 来调用 NGINX、OpenSSL 的 C 函数，来完成更多的功能。
+
+<p>实际上，FFI 方式比传统的 Lua/C API 方式的性能更优，这也是 lua-resty-core 项目（后面会介绍）存在的意义。</p>
+<h4 id="JIT-为什么不是全程编译？"><a href="#JIT-为什么不是全程编译？" class="headerlink" title="JIT 为什么不是全程编译？"></a>JIT 为什么不是全程编译？</h4><p>既然编译过后效率更高，为什么不采用全程编译，而是只针对热代码编译？</p>
+<ol>
+<li><p>时间</p>
+<p> 如果是少量运行，得不偿失</p>
+</li>
+<li><p>空间</p>
+<p> 编译后占用的内存会变大</p>
+</li>
+<li><p>JIT 编译优化需要运行的信息</p>
+<p> 并不是所有的编译执行都比解释执行效率高，给的运行时信息越多，效果越好</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>OpenResty</category>
+      </categories>
+      <tags>
+        <tag>OpenResty</tag>
+        <tag>OpenResty精华整理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《OpenResty精华整理》2.一次完整的请求流程是怎样的</title>
+    <url>/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B2.%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84/</url>
+    <content><![CDATA[<h1 id="OpenResty-一次完整的请求流程是怎样的"><a href="#OpenResty-一次完整的请求流程是怎样的" class="headerlink" title="OpenResty 一次完整的请求流程是怎样的"></a>OpenResty 一次完整的请求流程是怎样的</h1><p>OpenResty 使用 Nginx 作为底层的 Web 服务器。</p>
+<h2 id="Nginx-是如何接收到请求的"><a href="#Nginx-是如何接收到请求的" class="headerlink" title="Nginx 是如何接收到请求的"></a>Nginx 是如何接收到请求的</h2><h3 id="Nginx-整体架构"><a href="#Nginx-整体架构" class="headerlink" title="Nginx 整体架构"></a>Nginx 整体架构</h3><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%20%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Nginx 整体架构图</div>
+</center>
+
+<br/>
+Nginx 里有一个 master 进程和多个 worker 进程。
+
+<span id="more"></span>
+
+<p>master 进程并不处理网络请求，主要负责调度工作进程：加载配置、启动工作进程及非停升级。<br>worker 进程负责处理网络请求与响应。</p>
+<p>master 进程主要用来管 理worker 进程，具体包括如下 4 个主要功能：</p>
+<ul>
+<li>接收来自外界的信号。</li>
+<li>向各 worker 进程发送信号。</li>
+<li>监控 woker 进程的运行状态。</li>
+<li>当 woker 进程退出后（异常情况下），会自动重新启动新的 woker 进程。</li>
+</ul>
+<p>woker 进程主要用来处理基本的网络事件：</p>
+<ul>
+<li>多个 worker 进程之间是对等且相互独立的，他们同等竞争来自客户端的请求。</li>
+<li>每个 worker 进程是单线程。</li>
+<li>一个请求，只可能在一个 worker 进程中处理，一个 worker 进程，不可能处理其它进程的请求。</li>
+</ul>
+<h3 id="Nginx-模块化设计"><a href="#Nginx-模块化设计" class="headerlink" title="Nginx 模块化设计"></a>Nginx 模块化设计</h3><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%20%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97%E5%8F%8A%E5%85%B6%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Nginx 常用模块及其之间的关系</div>
+</center>
+
+<h3 id="Nginx-执行阶段"><a href="#Nginx-执行阶段" class="headerlink" title="Nginx 执行阶段"></a>Nginx 执行阶段</h3><p>下面是详细的 11 个阶段，每个阶段都可能对应着一个甚至多个 HTTP 模块：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%2011%20%E4%B8%AA%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E8%A1%A8%E6%A0%BC.jpg">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Nginx 11 个执行阶段表格</div>
+</center>
+
+<br/>
+1. POST_READ：在 read 完请求的头部之后，在没有对头部做任何处理之前，想要获取到一些原始的值，就应该在这个阶段进行处理。这里面会涉及到一个 realip 模块。
+2. SERVER_REWRITE：和下面的 REWRITE 阶段一样，都只有一个模块叫 rewrite 模块，一般没有第三方模块会处理这个阶段。
+3. FIND_CONFIG：做 location 的匹配，暂时没有模块会用到。
+4. REWRITE：对 URL 做一些处理。
+5. POST_WRITE：处于 REWRITE 之后，也是暂时没有模块会在这个阶段出现。
+接下来是确认用户访问权限的三个模块：
+
+<p>接下来是确认用户访问权限的三个模块：</p>
+<ol>
+<li>PREACCESS：是在 ACCESS 之前要做一些工作，例如并发连接和 QPS 需要进行限制，涉及到两个模块：limt_conn 和 limit_req</li>
+<li>ACCESS：核心要解决的是用户能不能访问的问题，例如 auth_basic 是用户名和密码，access 是用户访问 IP，auth_request 根据第三方服务返回是否可以去访问。</li>
+<li>POST_ACCESS：是在 ACCESS 之后会做一些事情，同样暂时没有模块会用到。</li>
+</ol>
+<p>最后的三个阶段处理响应和日志：</p>
+<ol>
+<li>PRECONTENT：在处理 CONTENT 之前会做一些事情，例如会把子请求发送给第三方的服务去处理，try_files 模块也是在这个阶段中。</li>
+<li>CONTENT：这个阶段涉及到的模块就非常多了，例如 index, autoindex, concat 等都是在这个阶段生效的。</li>
+<li>LOG：记录日志 access_log 模块。</li>
+</ol>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%2011%20%E4%B8%AA%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E7%A4%BA%E4%BE%8B.jpg">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Nginx 11 个执行阶段示例</div>
+</center>
+
+<h2 id="OpenResty-的运行机制"><a href="#OpenResty-的运行机制" class="headerlink" title="OpenResty 的运行机制"></a>OpenResty 的运行机制</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 的运行机制</div>
+</center>
+
+<h2 id="OpenResty-执行阶段"><a href="#OpenResty-执行阶段" class="headerlink" title="OpenResty 执行阶段"></a>OpenResty 执行阶段</h2><p>lua-nginx-module 以第三方模块的方式嵌入到 Nginx 的各个执行阶段里。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 执行阶段</div>
+</center>
+
+<br/>
+
+<p>常用的阶段有：</p>
+<ul>
+<li>init_by_lua*: master 启动，里面的变量会复制到各个 worker</li>
+<li>init_worker_by_lua*: worker 启动</li>
+<li>set_by_lua*: 流程分支处理判断变量初始化</li>
+<li>rewrite_by_lua*: 转发、重定向、缓存等功能(例如特定请求代理到外网)</li>
+<li>access_by_lua*: IP 准入、接口权限等情况集中处理(例如配合 iptable 完成简单防火墙)</li>
+<li>content_by_lua*: 内容生成</li>
+<li>header_filter_by_lua*: 响应头部过滤处理(例如添加头部信息)</li>
+<li>body_filter_by_lua*: 响应体过滤处理(例如完成应答内容统一成大写)</li>
+<li>log_by_lua*: 会话完成后本地异步完成日志记录(日志可以记录在本地，还可以同步到其他机器)</li>
+</ul>
+<h3 id="OpenResty-执行阶段和-Nginx-的对照"><a href="#OpenResty-执行阶段和-Nginx-的对照" class="headerlink" title="OpenResty 执行阶段和 Nginx 的对照"></a>OpenResty 执行阶段和 Nginx 的对照</h3><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E5%AF%B9%E7%85%A7.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 执行阶段对照</div>
+</center>
+]]></content>
+      <categories>
+        <category>OpenResty</category>
+      </categories>
+      <tags>
+        <tag>OpenResty</tag>
+        <tag>OpenResty精华整理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《OpenResty精华整理》4.一些特性和用法</title>
+    <url>/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B4.%E4%B8%80%E4%BA%9B%E7%89%B9%E6%80%A7%E5%92%8C%E7%94%A8%E6%B3%95/</url>
+    <content><![CDATA[<h1 id="一些特性和用法"><a href="#一些特性和用法" class="headerlink" title="一些特性和用法"></a>一些特性和用法</h1><h2 id="同步非阻塞"><a href="#同步非阻塞" class="headerlink" title="同步非阻塞"></a>同步非阻塞</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B0%83%E7%94%A8.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">非阻塞调用</div>
+</center>
+
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B0%83%E7%94%A8%E4%B8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">非阻塞调用下的同步和异步</div>
+</center>
+
+<br/>
+除了 ngx.timer 等少数异步操作外，使用 OpenResty 只需要编写同步的代码就可以，而不需要类似 Nginx 源码那样编写很多异步的代码。
+
+<span id="more"></span>
+
+<h2 id="文档格式一致"><a href="#文档格式一致" class="headerlink" title="文档格式一致"></a>文档格式一致</h2><p>/t 目录，它里面就是所有的测试案例</p>
+<center class="half">
+    <img data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/resty%20%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%841.png" width="400"/>
+    <img data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/resty%20%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%842.png" width="400"/>
+</center>
+
+<h2 id="shared-dict"><a href="#shared-dict" class="headerlink" title="shared dict"></a>shared dict</h2><p>shared dict 可以完成 worker 间的数据共享，并借此实现 worker 之间的通信</p>
+<h2 id="lua-nginx-module-vs-lua-resty-core"><a href="#lua-nginx-module-vs-lua-resty-core" class="headerlink" title="lua-nginx-module vs lua-resty-core"></a>lua-nginx-module vs lua-resty-core</h2><p>对于 OpenResty 的实现，可能大部分的认识都是 OpenResty 是基于 lua-nginx-module 实现的，而不知道 lua-resty-core 这个项目，实际上，官方后续的计划便是把越来越多的功能采用 lua-resty-core 重新实现。</p>
+<p>在核心的 lua-nginx-module 中，调用 C 函数的 API，都是使用 Lua C API 来完成的；</p>
+<p>而在 lua-resty-core 中，则是把 lua-nginx-module 已有的部分 API，使用 FFI 的模式重新实现了一遍。</p>
+<p>如果比较关注 <a href="http://openresty.org/en/changelog-1019003.html">OpenResty 新版特性</a> 的话，可以发现一些关于 lua-resty-core 的说明，比如基于 lua-resty-core 实现了更多的功能等等，都是基于这个目的，至于原因下面会讲到。</p>
+<p>需要澄清下，lua-nginx-module 提供的 API，是通过 C 实现，并通过 Lua CFunction 暴露出来的。</p>
+<p>而 lua-resty-core 提供的 API，也不是表面看上去那样用 Lua 实现的，是通过在 lua-nginx-module 里面的以 <em><em>lua_ffi</em></em> 形式命名的 C 函数实现的，并在 lua-resty-core 里面通过 LuaJIT FFI 暴露出来的。</p>
+<p>所以其实两者都是 C 实现。两者的比较，应该是 Lua CFunction 和 LuaJIT FFI 的比较。</p>
+<h3 id="Lua-CFunction"><a href="#Lua-CFunction" class="headerlink" title="Lua CFunction"></a>Lua CFunction</h3><p>以 ngx.base64_decode 举例，lua-nginx-module 实现</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">static int</span><br><span class="line"> ngx_http_lua_ngx_decode_base64(lua_State *L)</span><br><span class="line"> &#123;</span><br><span class="line">     ngx_str_t p, src;</span><br><span class="line"> </span><br><span class="line">    src.data &#x3D; (u_char *) luaL_checklstring(L, 1, &amp;src.len);</span><br><span class="line"> </span><br><span class="line">     p.len &#x3D; ngx_base64_decoded_length(src.len);</span><br><span class="line"> </span><br><span class="line">     p.data &#x3D; lua_newuserdata(L, p.len);</span><br><span class="line"> </span><br><span class="line">     if (ngx_decode_base64(&amp;p, &amp;src) &#x3D;&#x3D; NGX_OK) &#123;</span><br><span class="line">         lua_pushlstring(L, (char *) p.data, p.len);</span><br><span class="line"> </span><br><span class="line">     &#125; else &#123;</span><br><span class="line">         lua_pushnil(L);</span><br><span class="line">     &#125;</span><br><span class="line"> </span><br><span class="line">     return 1;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 C 编写的函数，无法把返回值传给 Lua 代码，而是需要通过栈，来传递 Lua 和 C 之间的调用参数和返回值。</p>
+<p>同时，这些代码也不能被 JIT 跟踪到，所以对于 LuaJIT 而言，这些操作是处于黑盒中的，没法进行优化。</p>
+<h3 id="LuaJIT-FFI"><a href="#LuaJIT-FFI" class="headerlink" title="LuaJIT FFI"></a>LuaJIT FFI</h3><p>FFI 的交互部分是用 Lua 实现的，这部分代码可以被 JIT 跟踪到，并进行优化；<br>当然，代码也会更加简洁易懂。</p>
+<p>以 ngx.base64_decode 举例，lua-resty-core 实现 <a href="https://github.com/openresty/lua-resty-core/blob/master/lib/resty/core/base64.lua#L60">https://github.com/openresty/lua-resty-core/blob/master/lib/resty/core/base64.lua#L60</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ngx.decode_base64 &#x3D; function (s)</span><br><span class="line">     local slen &#x3D; #s</span><br><span class="line">     local dlen &#x3D; base64_decoded_length(slen)</span><br><span class="line">     </span><br><span class="line">     local dst &#x3D; get_string_buf(dlen)</span><br><span class="line">     local pdlen &#x3D; get_size_ptr()</span><br><span class="line">     local ok &#x3D; C.ngx_http_lua_ffi_decode_base64(s, slen, dst, pdlen)</span><br><span class="line">     if ok &#x3D;&#x3D; 0 then</span><br><span class="line">         return nil</span><br><span class="line">     end</span><br><span class="line">     return ffi_string(dst, pdlen[0])</span><br><span class="line"> end</span><br></pre></td></tr></table></figure>
+
+<h3 id="值得说明的几个点"><a href="#值得说明的几个点" class="headerlink" title="值得说明的几个点"></a>值得说明的几个点</h3><ul>
+<li><p>FFI + JIT 在跟 C 领域频繁数据交互的领域才明显，例如：</p>
+<ul>
+<li>ngx.md5 相差不大</li>
+<li>ngx.ctx, ngx.re.find, ngx.time 效果相差几十倍</li>
+</ul>
+</li>
+<li><p>解释模式下 LuaJIT 的 FFI 操作很慢，比编译模式下慢十倍。<br>调用 Lua CFunction 会迫使 LuaJIT 退回到解释模式，而通过 FFI 调用 C 函数则不会。</p>
+</li>
+<li><p>除了不会打断 tracing，FFI 实现的版本还有另一个优势：LuaJIT 能够在编译时优化 FFI 实现代码。</p>
+</li>
+<li><p>在 OpenResty 2019 年 5 月份发布的 1.15.8.1 版本前，lua-resty-core 默认是不开启的，而这不仅会带来性能损失，更严重的是会造成潜在的 bug。</p>
+<p>强烈推荐还在使用历史版本的用户，都手动开启 lua-resty-core。只需要在 init_by_lua 阶段，增加一行代码就可以了：</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">require &quot;resty.core&quot;</span><br></pre></td></tr></table></figure>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.15.8.1 版本中，增加了 lua_load_resty_core 指令，可以选择开启或关闭加载 lua-resty-core（默认开启）。<br/><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.17.8.1 版本后，lua_load_resty_core 指令被废除，lua-resty-core 是强制加载的，这对于开源项目来说是一个很好的决定，在没有什么理由选择更糟糕的实现的时候，强制帮助用户选择好，防止给不熟悉的用户更多的疑惑性选择。</p>
+<ul>
+<li><p>OpenResty 中的函数都是有命名规范的，可以通过命名推测出它的用处。</p>
+<p>  比如：<br><br>  &ensp;&ensp;&ensp;&ensp;ngx_http_lua_ffi_ ，是用 FFI 来处理 NGINX HTTP 请求的 Lua 函数；<br><br>  &ensp;&ensp;&ensp;&ensp;ngx_http_lua_ngx_ ，是用 Cfunction 来处理 NGINX HTTP 请求的 Lua 函数；<br><br>  &ensp;&ensp;&ensp;&ensp;其他 ngx_ 和 lua_ 开头的函数，则分别属于 NGINX 和 Lua 的内置函数。</p>
+</li>
+</ul>
+<h2 id="ngx-ctx"><a href="#ngx-ctx" class="headerlink" title="ngx.ctx"></a>ngx.ctx</h2><p>ngx.ctx 可以在同一个请求的不同阶段之间共享数据。它其实就是一个普通的 Lua 的 table，所以速度很快，还可以存储各种 Lua 的对象。它的生命周期是请求级别的，当一个请求结束的时候，ngx.ctx 也会跟着被销毁掉。</p>
+<h2 id="定时任务"><a href="#定时任务" class="headerlink" title="定时任务"></a>定时任务</h2><p>ngx.timer.at，用来执行一次性的定时任务；<br>ngx.time.every，用来执行固定周期的定时任务。</p>
+<h2 id="特权进程"><a href="#特权进程" class="headerlink" title="特权进程"></a>特权进程</h2><p>我们都知道 Nginx 主要分为 master 进程和 worker 进程，其中，真正处理用户请求的是 worker 进程。</p>
+<p>而 OpenResty 在 Nginx 的基础上进行了扩展，增加了特权进程：privileged agent。</p>
+<p>特权进程很特别：</p>
+<ul>
+<li>它不监听任何端口，这就意味着不会对外提供任何服务；</li>
+<li>它拥有和 master 进程一样的权限，一般来说是 root 用户的权限，这就让它可以做很多 worker 进程不可能完成的任务；</li>
+<li>特权进程只能在 init_by_lua 上下文中开启；</li>
+<li>另外，特权进程只有运行在 init_worker_by_lua 上下文中才有意义，因为没有请求触发，也就不会走到content、access 等上下文去。</li>
+</ul>
+<p>开启特权进程：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">init_by_lua_block &#123;</span><br><span class="line">    local process &#x3D; require &quot;ngx.process&quot;</span><br><span class="line"></span><br><span class="line">    local ok, err &#x3D; process.enable_privileged_agent()</span><br><span class="line">    if not ok then</span><br><span class="line">        ngx.log(ngx.ERR, &quot;enables privileged agent failed error:&quot;, err)</span><br><span class="line">    end</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nginx: master process</span><br><span class="line">nginx: worker process</span><br><span class="line">nginx: privileged agent process</span><br></pre></td></tr></table></figure>
+
+<h2 id="test-nginx"><a href="#test-nginx" class="headerlink" title="test::nginx"></a>test::nginx</h2><p>test::nginx 是 OpenResty 测试体系中的核心，OpenResty 本身和周边的 lua-rety 库，都是使用它来组织和编写测试集的。</p>
+<p>虽然它一个是测试框架，但它的门槛非常高。这是因为， test::nginx 和一般的测试框架不同，并非基于断言，也不使用 Lua 语言，这就要求开发者从零开始学习和使用 test::nginx，并得扭转自身对测试框架固有的认知。</p>
+<p>test::nginx 糅合了 Perl、数据驱动以及 DSL（领域小语言）。对于同一份测试案例集，通过对参数和环境变量的控制，可以实现乱序执行、多次重复、内存泄漏检测、压力测试等不同的效果。</p>
+]]></content>
+      <categories>
+        <category>OpenResty</category>
+      </categories>
+      <tags>
+        <tag>OpenResty</tag>
+        <tag>OpenResty精华整理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《OpenResty精华整理》5.需要注意的点</title>
+    <url>/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/</url>
+    <content><![CDATA[<h1 id="需要注意的点"><a href="#需要注意的点" class="headerlink" title="需要注意的点"></a>需要注意的点</h1><h2 id="时间-API"><a href="#时间-API" class="headerlink" title="时间 API"></a>时间 API</h2><p>返回当前时间的 API，如果没有非阻塞网络 IO 操作来触发，便会一直返回缓存的值，而不是像我们想的那样，能够返回当前的实时时间。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ resty -e &#39;ngx.say(ngx.now())</span><br><span class="line">os.execute(&quot;sleep 1&quot;)</span><br><span class="line">ngx.say(ngx.now())&#39;</span><br></pre></td></tr></table></figure>
+
+<p>在两次调用 ngx.now 之间，使用 Lua 的阻塞函数 sleep 了 1 秒钟，但从打印的结果来看，这两次返回的时间戳却是一模一样的。<br>如果换成是非阻塞的 sleep 函数，它就会打印出不同的时间戳了。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ resty -e &#39;ngx.say(ngx.now())</span><br><span class="line">ngx.sleep(1)</span><br><span class="line">ngx.say(ngx.now())&#39;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h2 id="json-编码时无法区分-array-和-dict"><a href="#json-编码时无法区分-array-和-dict" class="headerlink" title="json 编码时无法区分 array 和 dict"></a>json 编码时无法区分 array 和 dict</h2><p>json 对空 table 编码的时候，无法确定编码为数组还是字典。</p>
+<p>OpenResty 的 cjson 库，默认把空 table 当做字典来编码。我们可以通过 encode_empty_table_as_object 这个函数，来修改这个全局的默认值：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">resty -e &#39;local cjson &#x3D; require &quot;cjson&quot;</span><br><span class="line">cjson.encode_empty_table_as_object(false)</span><br><span class="line">local t &#x3D; &#123;&#125;</span><br><span class="line">print(cjson.encode(t))&#39;</span><br></pre></td></tr></table></figure>
+
+<p>全局这种设置的影响面比较大，可以指定某个 table 的编码规则：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">resty -e &#39;local cjson &#x3D; require &quot;cjson&quot;</span><br><span class="line">local t &#x3D; &#123;&#125;</span><br><span class="line">setmetatable(t, cjson.empty_array_mt)</span><br><span class="line">print(cjson.encode(t))</span><br><span class="line">t &#x3D; &#123;123&#125;</span><br><span class="line">print(cjson.encode(t))&#39;</span><br></pre></td></tr></table></figure>
+
+<h2 id="真值和空值"><a href="#真值和空值" class="headerlink" title="真值和空值"></a>真值和空值</h2><h3 id="ngx-null"><a href="#ngx-null" class="headerlink" title="ngx.null"></a>ngx.null</h3><p>因为 Lua 的 nil 无法作为 table 的 value，所以 OpenResty 引入了 ngx.null，作为 table 中的空值。<br>只有 nil 和 false 是假值，ngx.null 的布尔值为真。如果遗漏了这一点，就很容易踩坑，比如在使用 lua-resty-redis 的时候，做了下面这个判断：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">local res, err &#x3D; red:get(&quot;dog&quot;)</span><br><span class="line">if not res then</span><br><span class="line">    res &#x3D; res + &quot;test&quot;</span><br><span class="line">end </span><br></pre></td></tr></table></figure>
+
+<p>在 dog 这个 key 不存在的情况下，这段代码就 500 崩溃了。</p>
+<h3 id="cdata-NULL"><a href="#cdata-NULL" class="headerlink" title="cdata:NULL"></a>cdata:NULL</h3><p>当通过 LuaJIT FFI 接口去调用 C 函数，而这个函数返回一个 NULL 指针，那么就会遇到另外一种空值，即 cdata:NULL 。<br>和 ngx.null 一样，cdata:NULL 也是真值。但下面这段代码，会打印出 true，也就是说 cdata:NULL 是和 nil 相等的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ resty -e &#39;local ffi &#x3D; require &quot;ffi&quot;</span><br><span class="line">local cdata_null &#x3D; ffi.new(&quot;void*&quot;, nil)</span><br><span class="line">ngx.say(cdata_null &#x3D;&#x3D; nil)&#39;</span><br></pre></td></tr></table></figure>
+
+<h3 id="cjson-null"><a href="#cjson-null" class="headerlink" title="cjson.null"></a>cjson.null</h3><p>Lua 中的 nil，被 json encode 和 decode 一圈儿之后，就变成了 cjson.null。它引入的原因和 ngx.null 是一样的，因为 nil 无法在 table 中作为 value。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ resty -e &#39;local cjson &#x3D; require &quot;cjson&quot;</span><br><span class="line">local data &#x3D; cjson.encode(nil)</span><br><span class="line">local decode_null &#x3D; cjson.decode(data)</span><br><span class="line">ngx.say(decode_null &#x3D;&#x3D; cjson.null)&#39;</span><br></pre></td></tr></table></figure>
+
+<h3 id="变量的个数限制"><a href="#变量的个数限制" class="headerlink" title="变量的个数限制"></a>变量的个数限制</h3><p>Lua 中，一个函数的局部变量的个数，和 upvalue 的个数都是有上限的，你可以从 Lua 的源码中得到印证：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;*</span><br><span class="line">@@ LUAI_MAXVARS is the maximum number of local variables per function</span><br><span class="line">@* (must be smaller than 250).</span><br><span class="line">*&#x2F;</span><br><span class="line">#define LUAI_MAXVARS 200</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;*</span><br><span class="line">@@ LUAI_MAXUPVALUES is the maximum number of upvalues per function</span><br><span class="line">@* (must be smaller than 250).</span><br><span class="line">*&#x2F;</span><br><span class="line">#define LUAI_MAXUPVALUES 60</span><br></pre></td></tr></table></figure>
+
+<p>这两个阈值，分别被硬编码为 200 和 60。虽说你可以手动修改源码来调整这两个值，不过最大也只能设置为 250。</p>
+<p>一般情况下，我们不会超过这个阈值，但写 OpenResty 代码的时候，还是要留意这个事情，不要过多地使用局部变量和 upvalue，而是要尽可能地使用 do .. end 做一层封装，来减少局部变量和 upvalue 的个数。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">local re_find &#x3D; ngx.re.find</span><br><span class="line">function foo()</span><br><span class="line">    ...</span><br><span class="line">end</span><br><span class="line">function bar()</span><br><span class="line">    ...</span><br><span class="line">end</span><br><span class="line">function fn()</span><br><span class="line">    ...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<p>如果只有函数 foo 使用到了 re_find， 可以这样改造下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">do</span><br><span class="line">    local re_find &#x3D; ngx.re.find</span><br><span class="line">    function foo()</span><br><span class="line">        ...</span><br><span class="line">    end</span><br><span class="line">end</span><br><span class="line">function bar()</span><br><span class="line">    ...</span><br><span class="line">end</span><br><span class="line">function fn()</span><br><span class="line">    ...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<p>这样一来，在 main 函数的层面上，就少了 re_find 这个局部变量。这在单个的大的 Lua 文件中，算是一个优化技巧。</p>
+]]></content>
+      <categories>
+        <category>OpenResty</category>
+      </categories>
+      <tags>
+        <tag>OpenResty</tag>
+        <tag>OpenResty精华整理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《OpenResty精华整理》6.性能优化</title>
+    <url>/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B6.%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</url>
+    <content><![CDATA[<h1 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h1><h2 id="避免使用-NYI"><a href="#避免使用-NYI" class="headerlink" title="避免使用 NYI"></a>避免使用 NYI</h2><h3 id="pairs-vs-ipairs"><a href="#pairs-vs-ipairs" class="headerlink" title="pairs() vs ipairs()"></a>pairs() vs ipairs()</h3><p>如果 table 内部为 array，应该优先使用哪个？为什么？</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/pairs%20vs%20ipairs.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">pairs vs ipairs</div>
+</center>
+
+<h3 id="NYI（Not-Yet-Implemented）的概念"><a href="#NYI（Not-Yet-Implemented）的概念" class="headerlink" title="NYI（Not Yet Implemented）的概念"></a>NYI（Not Yet Implemented）的概念</h3><p>LuaJIT 的运行时环境，除了一个汇编实现的 Lua 解释器外，还有一个可以直接生成机器代码的 JIT 编译器。</p>
+<p>LuaJIT 中 JIT 编译器的实现还不完善，有一些原语它还无法编译，因为这些原语实现起来比较困难，再加上 LuaJIT 的作者目前处于半退休状态。</p>
+<p>这些原语包括常见的 pairs() 函数、unpack() 函数、基于 Lua CFunction 实现的 Lua C 模块等。</p>
+<p>这样一来，当 JIT 编译器在当前代码路径上遇到它不支持的操作时，便会退回到解释器模式。</p>
+<p>全称为 Not Yet Implemented <a href="http://wiki.luajit.org/NYI">NYI 完整列表</a></p>
+<span id="more"></span>
+
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/NYI%20%E9%83%A8%E5%88%86%E7%A4%BA%E4%BE%8B.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">NYI 部分示例</div>
+</center>
+
+<br/>
+string.byte 对应的能否被编译的状态是 yes，表明可以被 JIT。
+
+<p>string.char 对应的编译状态是 2.1，表明从 LuaJIT 2.1 开始支持。</p>
+<p>string.dump 对应的编译状态是 never，即不会被 JIT，会退回到解释器模式。</p>
+<p>string.find 对应的编译状态是 2.1 partial，意思是从 LuaJIT 2.1 开始部分支持，后面的备注中写的是 只支持搜索固定的字符串，不支持模式匹配。所以对于固定字符串的查找，使用 string.find 是可以被 JIT 的。</p>
+<h3 id="NYI-的替代方案"><a href="#NYI-的替代方案" class="headerlink" title="NYI 的替代方案"></a>NYI 的替代方案</h3><h4 id="string-gsub-函数"><a href="#string-gsub-函数" class="headerlink" title="string.gsub() 函数"></a>string.gsub() 函数</h4><p>这个函数是一个 NYI 原语，无法被 JIT 编译。<br>它是 Lua 内置的字符串操作函数，作用是做全局的字符串替换。</p>
+<p>打开 <a href="https://github.com/openresty/lua-nginx-module#readme">lua-nginx-module 的 GitHub 文档页面</a>，可以用 gsub 作为关键字，在文档页面中搜索，找到 ngx.re.gsub</p>
+<h4 id="string-find-函数"><a href="#string-find-函数" class="headerlink" title="string.find() 函数"></a>string.find() 函数</h4><p>和 string.gsub 不同的是，string.find 在 plain 模式（即固定字符串的查找）下，是可以被 JIT 的；<br>而带有正则这种的字符串查找，string.find 并不能被 JIT ，这时就要换用 OpenResty 自己的 API，也就是 ngx.re.find 来完成。</p>
+<p>所以，当在 OpenResty 中做字符串查找时，首先一定要明确区分，要查找的是固定的字符串，还是正则表达式。</p>
+<p>如果是前者，就要用 string.find，并且记得把最后的 plain 设置为 true：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">string.find(&quot;foo bar&quot;, &quot;foo&quot;, 1, true)</span><br></pre></td></tr></table></figure>
+
+<p>如果是后者，应该用 OpenResty 自己的 API，并开启 PCRE 的 JIT 选项：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ngx.re.find(&quot;foo bar&quot;, &quot;^foo&quot;, &quot;jo&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>可以做一层封装，并把优化选项默认打开，不要让最终的使用者知道这么多细节。这样，对外就是统一的字符串查找函数了。</p>
+<h4 id="pairs-函数"><a href="#pairs-函数" class="headerlink" title="pairs() 函数"></a>pairs() 函数</h4><p>遍历哈希表的 pairs() 函数，它也不能被 JIT 编译。<br>这个并没有等价的替代方案，只能尽量避免使用，或者改用数字下标访问的数组，特别是在热代码路径上不要遍历哈希表。<br>代码热路径的意思是，这段代码会被反复执行很多次，比如在一个很大的循环里面。</p>
+<h3 id="实践总结"><a href="#实践总结" class="headerlink" title="实践总结"></a>实践总结</h3><ol>
+<li><p>优先使用 OpenResty 提供的 API，而不是 Lua 的标准库函数。这里要牢记， Lua 是嵌入式语言，我们实际上是在 OpenResty 中编程，而不是 Lua。</p>
+</li>
+<li><p>如果万不得已要使用 NYI 原语，请一定确保它没有在代码热路径上。</p>
+</li>
+</ol>
+<h3 id="如何检测-NYI？"><a href="#如何检测-NYI？" class="headerlink" title="如何检测 NYI？"></a>如何检测 NYI？</h3><p>LuaJIT 自带的 jit.dump 和 jit.v 模块。它们都可以打印出 JIT 编译器工作的过程。<br>前者会输出非常详细的信息，可以用来调试 LuaJIT 本身；<br>后者的输出比较简单，每行对应一个 trace，通常用来检测是否可以被 JIT。</p>
+<h4 id="想要简单验证的话，-使用-resty-就足够了"><a href="#想要简单验证的话，-使用-resty-就足够了" class="headerlink" title="想要简单验证的话， 使用 resty 就足够了"></a>想要简单验证的话， 使用 resty 就足够了</h4><p>其中，resty 的 -j 就是和 LuaJIT 相关的选项；后面的值为 dump 和 v，就对应着开启 jit.dump 和 jit.v 模式。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/resty%20-j.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">resty -j</div>
+</center>
+
+<br/>
+在 jit.v 模块的输出中，每一行都是一个成功编译的 trace 对象。上面是一个能够被 JIT 的例子，而如果遇到 NYI 原语，输出里面就会指明 NYI，比如下面这个 pairs 的例子：
+
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/test_NYI.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">test_NYI</div>
+</center>
+
+<h4 id="系统验证"><a href="#系统验证" class="headerlink" title="系统验证"></a>系统验证</h4><p>可以先在 init_by_lua 中，添加以下两行代码：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">local v &#x3D; require &quot;jit.v&quot;</span><br><span class="line">v.on(&quot;&#x2F;tmp&#x2F;jit.log&quot;)</span><br></pre></td></tr></table></figure>
+
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/test%20jit%20code.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">test jit code</div>
+</center>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/jit_log.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">jit_log</div>
+</center>
+
+<h2 id="避免使用阻塞操作"><a href="#避免使用阻塞操作" class="headerlink" title="避免使用阻塞操作"></a>避免使用阻塞操作</h2><p>OpenResty 之所以可以保持很高的性能，简单来说，是因为它借用了 Nginx 的事件处理和 Lua 的协程机制。</p>
+<ul>
+<li>在遇到网络 I/O 等需要等待返回才能继续的操作时，就会先调用 Lua 协程的 yield 把自己挂起，然后在 Nginx 中注册回调；</li>
+<li>在 I/O 操作完成（也可能是超时或者出错）后，由 Nginx 回调 resume，来唤醒 Lua 协程。</li>
+</ul>
+<p>这样的流程，保证了 OpenResty 可以一直高效地使用 CPU 资源，来处理所有的请求。</p>
+<p>在这个处理流程中，如果没有使用 cosocket 这种非阻塞的方式，而是用阻塞的函数来处理 I/O，那么 LuaJIT 就不会把控制权交给 Nginx 的事件循环。这就会导致，其他的请求要一直排队等待阻塞的事件处理完，才会得到响应。</p>
+<p>另外，Lua 世界的库很可能会带来阻塞，让原本高性能的服务，直接下降几个数量级。在可选择的情况下，一般要选择 OpenResty 或者 LuaJit 实现的库，而不是采用 Lua 世界的库。</p>
+<p>综上所述，在 OpenResty 的编程中，对于可能出现阻塞的函数调用，要特别谨慎；否则，一行阻塞的代码，就会把整个服务的性能拖垮，让服务性能下降 10 倍。</p>
+<h3 id="os-execute"><a href="#os-execute" class="headerlink" title="os.execute"></a>os.execute</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">os.execute(&quot; cp test.exe &#x2F;tmp &quot;)</span><br><span class="line"></span><br><span class="line">os.execute(&quot; openssl genrsa -des3 -out private.pem 2048 &quot;)</span><br></pre></td></tr></table></figure>
+<p>os.execute 是 Lua 的内置函数，属于阻塞操作，而在 Lua 世界中，也确实是用这种方式来调用外部命令的。</p>
+<p>但是，我们要记住，Lua 是一种嵌入式语言，它在不同的上下文环境中，会有完全不同的推荐用法。</p>
+<p>在 OpenResty 的环境中，os.execute 会阻塞当前请求。所以，如果这个命令的执行时间特别短，那么影响还不是很大；</p>
+<p>可如果这个命令，需要执行几百毫秒甚至几秒钟的时间，那么性能就会有急剧的下降。</p>
+<p>解决方案：</p>
+<ol>
+<li>可以优先使用 优先使用 FFI 的方式来调用</li>
+<li>使用基于 ngx.pipe 的 lua-resty-shell 库</li>
+</ol>
+<h3 id="磁盘-I-O"><a href="#磁盘-I-O" class="headerlink" title="磁盘 I/O"></a>磁盘 I/O</h3><p>比如 io.open ，属于阻塞操作，来获取某个文件中的所有内容。</p>
+<p>如果在 init 和 init worker 中调用，那么它其实是个一次性的动作，并没有影响任何终端用户的请求，是完全可以被接受的。</p>
+<p>但是，如果每一个用户的请求，都会触发磁盘的读写，那就变得不可接受了。</p>
+<p>解决方案：</p>
+<ol>
+<li>可以使用 lua-io-nginx-module 这个第三方的 C 模块。这种方式的原理是，lua-io-nginx-module 利用了 Nginx 的线程池，把磁盘 I/O 操作从主线程转移到另外一个线程中处理，这样，主线程就不会因为磁盘 I/O 操作而被阻塞。不过，使用这个库时，你需要重新编译 Nginx，因为它是一个 C 模块。</li>
+<li>尝试架构上的调整。对于这类磁盘 I/O，是否可以换种方式，不再读写本地磁盘。比如记录日志 ngx.log 会大量而频繁的磁盘写入，也会严重地影响性能。这时可以把日志发送到远端的日志服务器上，这样就可以用 cosocket 来完成非阻塞的网络通信了，也就是把阻塞的磁盘 I/O 丢给日志服务，不要阻塞对外的服务。</li>
+</ol>
+<h3 id="luasocket"><a href="#luasocket" class="headerlink" title="luasocket"></a>luasocket</h3><p>也是容易被开发者用到的一个 Lua 内置库，属于阻塞操作，经常有人分不清 luasocket 和 OpenResty 提供的 cosocket。luasocket 也可以完成网络通信的功能，但它并没有非阻塞的优势。如果使用了 luasocket，那么性能也会急剧下降。</p>
+<p>但是，luasocket 同样有它独特的使用场景。前面讲过，cosocket 在不少阶段是无法使用的，一般可以用 ngx.timer 的方式来绕过。同时，也可以在 init_by_lua* 和 init_worker_by_lua* 这种一次性的阶段中，使用 luasocket 来完成 cosocket 的功能。</p>
+<h2 id="字符串拼接"><a href="#字符串拼接" class="headerlink" title="字符串拼接"></a>字符串拼接</h2><p>在 Lua 中，字符串是不可变的。涉及到字符串的新增和 GC 时，每当新增一个字符串，LuaJIT 都得调用 lj_str_new，去查询这个字符串是否已经存在；没有的话，便需要再创建新的字符串。如果操作很频繁，自然就会对性能有非常大的影响。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ resty -e &#39;local begin &#x3D; ngx.now()</span><br><span class="line">local s &#x3D; &quot;&quot;</span><br><span class="line">-- for 循环，使用 .. 进行字符串拼接</span><br><span class="line">for i &#x3D; 1, 100000 do</span><br><span class="line">    s &#x3D; s .. &quot;a&quot;</span><br><span class="line">end</span><br><span class="line">ngx.update_time()</span><br><span class="line">print(ngx.now() - begin)</span><br><span class="line">&#39;</span><br></pre></td></tr></table></figure>
+<p>改为使用 table.concat</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ resty -e &#39;local begin &#x3D; ngx.now()</span><br><span class="line">local t &#x3D; &#123;&#125;</span><br><span class="line">-- for 循环，使用数组来保存字符串，自己维护数组的长度</span><br><span class="line">for i &#x3D; 1, 100000 do</span><br><span class="line">    t[i] &#x3D; &quot;a&quot;</span><br><span class="line">end</span><br><span class="line">local s &#x3D;  table.concat(t, &quot;&quot;)</span><br><span class="line">ngx.update_time()</span><br><span class="line">print(ngx.now() - begin)</span><br><span class="line">&#39;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ngx-location-capture"><a href="#ngx-location-capture" class="headerlink" title="ngx.location.capture"></a>ngx.location.capture</h2><p>在 OpenResty 中如果使用子请求，会使用到 ngx.location.capture 这个函数，但是根据 <a href="https://github.com/openresty/lua-nginx-module#ngxlocationcapture">ngx.location.capture 的官方文档</a> 以及作者的亲自回复，如果在传递一个很大的 body 的时候，应该使用流式的 cosocket 库来代替。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E5%85%B3%E4%BA%8E%20ngx.location.capture%20%E7%9A%84%E6%9F%90%E6%AC%A1%E5%9B%9E%E5%A4%8D.png">
+    <br>
+</center>
+
+<br/>
+因为这个函数每次都会先把很大的 body 放到内存里，然后再处理转发，这样的效率是非常低的。
+
+<h2 id="table-new-narray-nhash"><a href="#table-new-narray-nhash" class="headerlink" title="table.new(narray, nhash)"></a>table.new(narray, nhash)</h2><p>这个函数，会预先分配好指定的数组和哈希的空间大小，而不是在插入元素时自增长，这也是它的两个参数 narray 和 nhash 的含义。<br>如果不使用这个函数，自增长是一个代价比较高的操作，会涉及到空间分配、resize 和 rehash 等，我们应该尽量避免。</p>
+<p>table.new 的文档并没有出现在 LuaJIT 的官网，而是深藏在 GitHub 项目的 <a href="https://github.com/openresty/luajit2/blob/v2.1-agentzh/doc/extensions.html">扩展文档</a> 里，用谷歌也很难找到，所以很多人并不知道这个函数的存在。</p>
+<p>超出预设的空间大小，也可以正常使用，只不过性能会退化，也就失去了使用 table.new 的意义。</p>
+<p>需要根据实际场景，来预设好 table.new 中数组和哈希空间的大小，这样才能在性能和内存占用上找到一个平衡点。</p>
+<p>下图是在 lua-resty-mysql 中的使用方法，同样，在 lua-resty-redis 以及其它项目里也存在类似的例子</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/table.new%20%E4%BD%BF%E7%94%A8%E4%BE%8B%E5%AD%90.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">table.new 使用例子</div>
+</center>
+
+<h2 id="table-clear"><a href="#table-clear" class="headerlink" title="table.clear()"></a>table.clear()</h2><p>清空 table，它用来清空某个 table 里的所有数据，但并不会释放数组和哈希部分占用的内存。<br>所以，它在循环利用 Lua table 时非常有用，可以避免反复创建和销毁 table 的开销。</p>
+<p>对于大的 table，效率反而会降低，因为清空的时间高于重新创建的时间 （&gt;1000）</p>
+<h2 id="table-insert"><a href="#table-insert" class="headerlink" title="table.insert"></a>table.insert</h2><p>table.insert 虽然是一个很常见的操作，但性能并不乐观。<br>如果不是根据指定下标来插入元素，那么每次都需要调用 LuaJIT 的 lj_tab_len 来获取数组的长度，以便插入队尾。获取 table 长度的时间复杂度为 O(n) 。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/%E6%89%8B%E5%8A%A8%E8%AE%A1%E7%AE%97%E4%B8%8B%E6%A0%87%E9%81%BF%E5%85%8D%20table.insert.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">手动计算下标避免 table.insert</div>
+</center>
+
+<br/>
+一个综合实际优化的例子：<br/>
+　　　　ingress-nginx 是 k8s 官方的一个项目，主要使用 Go、 Nginx 和 lua-nginx-module 来处理入口流量。<br/>
+　　　　其中一个关于使用 table 相关函数进行性能优化的 PR：<br/>
+　　　　　　　　https://github.com/kubernetes/ingress-nginx/pull/3673/commits
+
+<h2 id="OpenResty-的-table-扩展函数"><a href="#OpenResty-的-table-扩展函数" class="headerlink" title="OpenResty 的 table 扩展函数"></a>OpenResty 的 table 扩展函数</h2><p>OpenResty 自己维护的 LuaJIT 分支，也对 table 做了扩展，它 <a href="https://github.com/openresty/luajit2/#new-api">新增了几个 API：table.isempty、table.isarray、 table.nkeys 和 table.clone</a>。</p>
+<h2 id="关于-OpenResty-的正则"><a href="#关于-OpenResty-的正则" class="headerlink" title="关于 OpenResty 的正则"></a>关于 OpenResty 的正则</h2><p>OpenResty 中并行着两套字符串匹配方法：Lua 自带的 sting 库，以及 OpenResty 提供的 ngx.re.* API。<br>其中， Lua 正则模式匹配是自己独有的格式，和 PCRE 的写法不同。</p>
+<p>Lua 自带的正则匹配库，不仅代码维护成本高，而且性能低—，不能被 JIT，而且被编译过一次的模式也不会被缓存。</p>
+<p>所以，在使用 Lua 内置的 string 库去做 find、match 等操作时，如果有类似正则这样的需求，直接使用 OpenResty 提供的 ngx.re 来替代。</p>
+<p>只有在查找固定字符串的时候，我们才考虑使用 plain 模式来调用 string 库。</p>
+<p>这是一个函数示例：<a href="https://github.com/openresty/lua-nginx-module#ngxrematch">ngx.re.match</a></p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E6%AD%A3%E5%88%99%E9%80%89%E9%A1%B9.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 正则选项</div>
+</center>
+
+<br/>
+通过查看参数 options 的文档，会发现，只要我们把它设置为 jo，就开启了 PCRE 的 JIT。
+这样，使用 ngx.re.gsub 的代码，既可以被 LuaJIT 进行 JIT 编译，也可以被 PCRE JIT 进行 JIT 编译。
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">local function fun1(str)</span><br><span class="line">    local aaaa, bbbb, ccccc &#x3D; ngx.re.find(str, &quot;\\?|&amp;&quot;, &quot;jo&quot;)</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">local function fun2(str)</span><br><span class="line">    local aaaa, bbbb, ccccc &#x3D; ngx.re.find(str, &quot;\\?|&amp;&quot;)</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<p>性能差距在一个数量级，大概 20 倍左右。</p>
+]]></content>
+      <categories>
+        <category>OpenResty</category>
+      </categories>
+      <tags>
+        <tag>OpenResty</tag>
+        <tag>OpenResty精华整理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《OpenResty精华整理》7.一些比较有用的库</title>
+    <url>/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B7.%E4%B8%80%E4%BA%9B%E6%AF%94%E8%BE%83%E6%9C%89%E7%94%A8%E7%9A%84%E5%BA%93/</url>
+    <content><![CDATA[<h1 id="一些比较有用的库"><a href="#一些比较有用的库" class="headerlink" title="一些比较有用的库"></a>一些比较有用的库</h1><h2 id="awesome-resty"><a href="#awesome-resty" class="headerlink" title="awesome-resty"></a>awesome-resty</h2><p><a href="https://github.com/bungle/awesome-resty">awesome-resty</a> 这个项目，维护了几乎所有 OpenResty 可用的包。</p>
+<h2 id="lua-resty-jit-uuid"><a href="#lua-resty-jit-uuid" class="headerlink" title="lua-resty-jit-uuid"></a>lua-resty-jit-uuid</h2><p><a href="https://github.com/thibaultCha/lua-resty-jit-uuid">lua-resty-jit-uuid</a> 用于生成 uuid，注意如果在容器中使用需要对种子特殊处理。</p>
+<h2 id="lua-rapidjson"><a href="#lua-rapidjson" class="headerlink" title="lua-rapidjson"></a>lua-rapidjson</h2><p><a href="https://github.com/xpol/lua-rapidjson">lua-rapidjson</a>，它是对 rapidjson 这个腾讯开源的 JSON 库的封装，以性能见长。支持 JSON Schema，JSON Schema 是一个通用的标准，借助这个标准，可以精确地描述接口中参数的格式，以及如何校验的问题。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&quot;stringArray&quot;: &#123;</span><br><span class="line">    &quot;type&quot;: &quot;array&quot;,</span><br><span class="line">    &quot;items&quot;: &#123; &quot;type&quot;: &quot;string&quot; &#125;,</span><br><span class="line">    &quot;minItems&quot;: 1,</span><br><span class="line">    &quot;uniqueItems&quot;: true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h2 id="lua-resty-worker-events"><a href="#lua-resty-worker-events" class="headerlink" title="lua-resty-worker-events"></a>lua-resty-worker-events</h2><p><a href="https://github.com/Kong/lua-resty-worker-events">lua-resty-worker-events</a>，可以实现 OpenResty 中 worker 间通信。</p>
+<p>比如有一个场景，存在多个 worker，只有一个 worker 收到了更新操作，并把结果写入了共享字典和自己 worker 内的 lru 缓存。那么，其他的 worker 怎么才能被通知去更新这项配置？这个时候这个库就派上用场了。</p>
+<h2 id="lua-resty-limit-traffic"><a href="#lua-resty-limit-traffic" class="headerlink" title="lua-resty-limit-traffic"></a>lua-resty-limit-traffic</h2><p>常用的流量控制算法，有漏桶和令牌桶。</p>
+<p><a href="https://github.com/openresty/lua-resty-limit-traffic">lua-resty-limit-traffic</a>，里面包含了 limit-req（限制请求速率）、 limit-count（限制请求数） 和 limit-conn （限制并发连接数）这三种不同的限制方式；并且提供了limit.traffic ，可以把这三种方式进行聚合使用。</p>
+<h3 id="Nginx-的限速模块"><a href="#Nginx-的限速模块" class="headerlink" title="Nginx 的限速模块"></a>Nginx 的限速模块</h3><p>在 Nginx 中，limit_req 模块是最常用的限速模块，下面是一个简单的配置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">limit_req_zone $binary_remote_addr zone&#x3D;one:10m rate&#x3D;1r&#x2F;s;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    location &#x2F;search&#x2F; &#123;</span><br><span class="line">        limit_req zone&#x3D;one burst&#x3D;5;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码是把终端的 IP 地址作为 key，申请了一块名为 one 的 10M 的内存空间地址，并把速率限制为每秒 1 个请求。</p>
+<p>在 server 的 location 中，还引用了 one 这个限速规则，并把 brust 设置为 5。</p>
+<p>这就表示在超过速率 1r/s 的情况下，同时允许有 5 个请求排队等待被处理，给出了一定的缓存区。</p>
+<p>要注意，如果没有设置 brust ，超过速率的请求是会被直接拒绝的。Nginx 的这个模块基于漏桶来实现，resty.limit.req ，本质都是一样的。</p>
+<ul>
+<li>第一个问题是，限速的 key 被限制在 Nginx 的变量范围内，不能灵活地设置。比如，根据不同的省份和不同的客户端渠道，来设置不同的限速阈值，这种常见的需求用 Nginx 就没有办法实现。</li>
+<li>另外一个更大的问题是，不能动态地调整速率，每次修改都需要重载 Nginx 服务。这样一来，根据不同的时间段限速这种需求，很难优雅的实现。</li>
+</ul>
+<h3 id="限速器的组合"><a href="#限速器的组合" class="headerlink" title="限速器的组合"></a>限速器的组合</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">local lim1, err &#x3D; limit_req.new(&quot;my_req_store&quot;, 300, 200)</span><br><span class="line">local lim2, err &#x3D; limit_req.new(&quot;my_req_store&quot;, 200, 100)</span><br><span class="line">local lim3, err &#x3D; limit_conn.new(&quot;my_conn_store&quot;, 1000, 1000, 0.5)</span><br><span class="line"></span><br><span class="line">local limiters &#x3D; &#123;lim1, lim2, lim3&#125;</span><br><span class="line">local host &#x3D; ngx.var.host</span><br><span class="line">local client &#x3D; ngx.var.binary_remote_addr</span><br><span class="line">local keys &#x3D; &#123;host, client, client&#125;</span><br><span class="line"></span><br><span class="line">local delay, err &#x3D; limit_traffic.combine(limiters, keys, states)</span><br></pre></td></tr></table></figure>
+
+<p>存在对 limiter 做演习的概念，第一个通过，被第二个拒绝，第一个不会被算做次数。<br>这样组合以后，就可以为多个限流器设置不同的阈值和 key，实现更复杂的业务需求。</p>
+]]></content>
+      <categories>
+        <category>OpenResty</category>
+      </categories>
+      <tags>
+        <tag>OpenResty</tag>
+        <tag>OpenResty精华整理</tag>
       </tags>
   </entry>
 </search>

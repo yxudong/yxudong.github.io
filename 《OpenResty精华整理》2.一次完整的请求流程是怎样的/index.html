@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="google-site-verification" content="SO8jlY8yDJsvenFPB1vGvI2P2UfX9ECKyIUYN7G5TU8">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yxudong.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"buttons","active":"valine","storage":true,"lazyload":true,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="OpenResty 一次完整的请求流程是怎样的OpenResty 使用 Nginx 作为底层的 Web 服务器。 Nginx 是如何接收到请求的Nginx 整体架构               Nginx 整体架构图    Nginx 里有一个 master 进程和多个 worker 进程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《OpenResty精华整理》2.一次完整的请求流程是怎样的">
+<meta property="og:url" content="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B2.%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84/index.html">
+<meta property="og:site_name" content="Yxd&#39;s Blog">
+<meta property="og:description" content="OpenResty 一次完整的请求流程是怎样的OpenResty 使用 Nginx 作为底层的 Web 服务器。 Nginx 是如何接收到请求的Nginx 整体架构               Nginx 整体架构图    Nginx 里有一个 master 进程和多个 worker 进程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%20%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%20%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97%E5%8F%8A%E5%85%B6%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%2011%20%E4%B8%AA%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E8%A1%A8%E6%A0%BC.jpg">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%2011%20%E4%B8%AA%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E7%A4%BA%E4%BE%8B.jpg">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.png">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5.png">
+<meta property="og:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E5%AF%B9%E7%85%A7.png">
+<meta property="article:published_time" content="2021-05-08T03:45:44.000Z">
+<meta property="article:modified_time" content="2021-05-08T03:46:44.999Z">
+<meta property="article:author" content="Yxd">
+<meta property="article:tag" content="OpenResty">
+<meta property="article:tag" content="OpenResty精华整理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%20%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+
+<link rel="canonical" href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B2.%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《OpenResty精华整理》2.一次完整的请求流程是怎样的 | Yxd's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yxd's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">个人博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B2.%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yxd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yxd's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《OpenResty精华整理》2.一次完整的请求流程是怎样的
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-08 11:45:44 / 修改时间：11:46:44" itemprop="dateCreated datePublished" datetime="2021-05-08T11:45:44+08:00">2021-05-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenResty/" itemprop="url" rel="index"><span itemprop="name">OpenResty</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B2.%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B2.%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="OpenResty-一次完整的请求流程是怎样的"><a href="#OpenResty-一次完整的请求流程是怎样的" class="headerlink" title="OpenResty 一次完整的请求流程是怎样的"></a>OpenResty 一次完整的请求流程是怎样的</h1><p>OpenResty 使用 Nginx 作为底层的 Web 服务器。</p>
+<h2 id="Nginx-是如何接收到请求的"><a href="#Nginx-是如何接收到请求的" class="headerlink" title="Nginx 是如何接收到请求的"></a>Nginx 是如何接收到请求的</h2><h3 id="Nginx-整体架构"><a href="#Nginx-整体架构" class="headerlink" title="Nginx 整体架构"></a>Nginx 整体架构</h3><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%20%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Nginx 整体架构图</div>
+</center>
+
+<br/>
+Nginx 里有一个 master 进程和多个 worker 进程。
+
+<span id="more"></span>
+
+<p>master 进程并不处理网络请求，主要负责调度工作进程：加载配置、启动工作进程及非停升级。<br>worker 进程负责处理网络请求与响应。</p>
+<p>master 进程主要用来管 理worker 进程，具体包括如下 4 个主要功能：</p>
+<ul>
+<li>接收来自外界的信号。</li>
+<li>向各 worker 进程发送信号。</li>
+<li>监控 woker 进程的运行状态。</li>
+<li>当 woker 进程退出后（异常情况下），会自动重新启动新的 woker 进程。</li>
+</ul>
+<p>woker 进程主要用来处理基本的网络事件：</p>
+<ul>
+<li>多个 worker 进程之间是对等且相互独立的，他们同等竞争来自客户端的请求。</li>
+<li>每个 worker 进程是单线程。</li>
+<li>一个请求，只可能在一个 worker 进程中处理，一个 worker 进程，不可能处理其它进程的请求。</li>
+</ul>
+<h3 id="Nginx-模块化设计"><a href="#Nginx-模块化设计" class="headerlink" title="Nginx 模块化设计"></a>Nginx 模块化设计</h3><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%20%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97%E5%8F%8A%E5%85%B6%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Nginx 常用模块及其之间的关系</div>
+</center>
+
+<h3 id="Nginx-执行阶段"><a href="#Nginx-执行阶段" class="headerlink" title="Nginx 执行阶段"></a>Nginx 执行阶段</h3><p>下面是详细的 11 个阶段，每个阶段都可能对应着一个甚至多个 HTTP 模块：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%2011%20%E4%B8%AA%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E8%A1%A8%E6%A0%BC.jpg">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Nginx 11 个执行阶段表格</div>
+</center>
+
+<br/>
+1. POST_READ：在 read 完请求的头部之后，在没有对头部做任何处理之前，想要获取到一些原始的值，就应该在这个阶段进行处理。这里面会涉及到一个 realip 模块。
+2. SERVER_REWRITE：和下面的 REWRITE 阶段一样，都只有一个模块叫 rewrite 模块，一般没有第三方模块会处理这个阶段。
+3. FIND_CONFIG：做 location 的匹配，暂时没有模块会用到。
+4. REWRITE：对 URL 做一些处理。
+5. POST_WRITE：处于 REWRITE 之后，也是暂时没有模块会在这个阶段出现。
+接下来是确认用户访问权限的三个模块：
+
+<p>接下来是确认用户访问权限的三个模块：</p>
+<ol>
+<li>PREACCESS：是在 ACCESS 之前要做一些工作，例如并发连接和 QPS 需要进行限制，涉及到两个模块：limt_conn 和 limit_req</li>
+<li>ACCESS：核心要解决的是用户能不能访问的问题，例如 auth_basic 是用户名和密码，access 是用户访问 IP，auth_request 根据第三方服务返回是否可以去访问。</li>
+<li>POST_ACCESS：是在 ACCESS 之后会做一些事情，同样暂时没有模块会用到。</li>
+</ol>
+<p>最后的三个阶段处理响应和日志：</p>
+<ol>
+<li>PRECONTENT：在处理 CONTENT 之前会做一些事情，例如会把子请求发送给第三方的服务去处理，try_files 模块也是在这个阶段中。</li>
+<li>CONTENT：这个阶段涉及到的模块就非常多了，例如 index, autoindex, concat 等都是在这个阶段生效的。</li>
+<li>LOG：记录日志 access_log 模块。</li>
+</ol>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/Nginx%2011%20%E4%B8%AA%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E7%A4%BA%E4%BE%8B.jpg">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Nginx 11 个执行阶段示例</div>
+</center>
+
+<h2 id="OpenResty-的运行机制"><a href="#OpenResty-的运行机制" class="headerlink" title="OpenResty 的运行机制"></a>OpenResty 的运行机制</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 的运行机制</div>
+</center>
+
+<h2 id="OpenResty-执行阶段"><a href="#OpenResty-执行阶段" class="headerlink" title="OpenResty 执行阶段"></a>OpenResty 执行阶段</h2><p>lua-nginx-module 以第三方模块的方式嵌入到 Nginx 的各个执行阶段里。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 执行阶段</div>
+</center>
+
+<br/>
+
+<p>常用的阶段有：</p>
+<ul>
+<li>init_by_lua*: master 启动，里面的变量会复制到各个 worker</li>
+<li>init_worker_by_lua*: worker 启动</li>
+<li>set_by_lua*: 流程分支处理判断变量初始化</li>
+<li>rewrite_by_lua*: 转发、重定向、缓存等功能(例如特定请求代理到外网)</li>
+<li>access_by_lua*: IP 准入、接口权限等情况集中处理(例如配合 iptable 完成简单防火墙)</li>
+<li>content_by_lua*: 内容生成</li>
+<li>header_filter_by_lua*: 响应头部过滤处理(例如添加头部信息)</li>
+<li>body_filter_by_lua*: 响应体过滤处理(例如完成应答内容统一成大写)</li>
+<li>log_by_lua*: 会话完成后本地异步完成日志记录(日志可以记录在本地，还可以同步到其他机器)</li>
+</ul>
+<h3 id="OpenResty-执行阶段和-Nginx-的对照"><a href="#OpenResty-执行阶段和-Nginx-的对照" class="headerlink" title="OpenResty 执行阶段和 Nginx 的对照"></a>OpenResty 执行阶段和 Nginx 的对照</h3><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    data-src="https://yxd-blog.oss-cn-shanghai.aliyuncs.com/OpenResty/OpenResty%20%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E5%AF%B9%E7%85%A7.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">OpenResty 执行阶段对照</div>
+</center>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yxd
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B2.%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84/" title="《OpenResty精华整理》2.一次完整的请求流程是怎样的">https://yxudong.github.io/《OpenResty精华整理》2.一次完整的请求流程是怎样的/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/OpenResty/" rel="tag"><i class="fa fa-tag"></i> OpenResty</a>
+              <a href="/tags/OpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> OpenResty精华整理</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B1.%E5%AE%89%E8%A3%85%E5%90%8E%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E4%BB%A5%E5%8F%8A%20GitHub%20%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%A7%88/" rel="prev" title="《OpenResty精华整理》1.安装后的目录结构以及 GitHub 项目概览">
+      <i class="fa fa-chevron-left"></i> 《OpenResty精华整理》1.安装后的目录结构以及 GitHub 项目概览
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B3.OpenResty%20%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%8E%9F%E5%9B%A0/" rel="next" title="《OpenResty精华整理》3.OpenResty 高性能的原因">
+      《OpenResty精华整理》3.OpenResty 高性能的原因 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenResty-%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84"><span class="nav-number">1.</span> <span class="nav-text">OpenResty 一次完整的请求流程是怎样的</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-%E6%98%AF%E5%A6%82%E4%BD%95%E6%8E%A5%E6%94%B6%E5%88%B0%E8%AF%B7%E6%B1%82%E7%9A%84"><span class="nav-number">1.1.</span> <span class="nav-text">Nginx 是如何接收到请求的</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">Nginx 整体架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-%E6%A8%A1%E5%9D%97%E5%8C%96%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.1.2.</span> <span class="nav-text">Nginx 模块化设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5"><span class="nav-number">1.1.3.</span> <span class="nav-text">Nginx 执行阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenResty-%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.</span> <span class="nav-text">OpenResty 的运行机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenResty-%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5"><span class="nav-number">1.3.</span> <span class="nav-text">OpenResty 执行阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenResty-%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5%E5%92%8C-Nginx-%E7%9A%84%E5%AF%B9%E7%85%A7"><span class="nav-number">1.3.1.</span> <span class="nav-text">OpenResty 执行阶段和 Nginx 的对照</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yxd"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yxd</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yxudong" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yxudong" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/yxd_Joshua" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;yxd_Joshua" rel="noopener" target="_blank"><i class="fab fa-douban fa-fw"></i>豆瓣</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/yang-xu-dong-87" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;yang-xu-dong-87" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>知乎</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://space.bilibili.com/17864348" title="Bilibili → https:&#x2F;&#x2F;space.bilibili.com&#x2F;17864348" rel="noopener" target="_blank"><i class="fab fa-bilibili fa-fw"></i>Bilibili</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yxd</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'QaqlJI7mSHOIkkOgTK0xS3pm-gzGzoHsz',
+      appKey     : 'FRspuPCpiKqjmQnxflyLyPMH',
+      placeholder: "请在此输入您的留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+  
+  
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+  <script src="/lib/live2d-widget/autoload.js"></script>
+</body>
+</html>
