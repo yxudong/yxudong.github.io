@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://yxudong.github.io/Redis-%E9%9D%A2%E8%AF%95%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%8B%EF%BC%89/</loc>
+    
+    <lastmod>2021-05-13</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://yxudong.github.io/Redis-%E9%9D%A2%E8%AF%95%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%AD%EF%BC%89/</loc>
+    
+    <lastmod>2021-05-13</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B5.%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9/</loc>
     
     <lastmod>2021-05-08</lastmod>
@@ -31,20 +45,6 @@
   
   <url>
     <loc>https://yxudong.github.io/%E3%80%8AOpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86%E3%80%8B3.OpenResty%20%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E5%8E%9F%E5%9B%A0/</loc>
-    
-    <lastmod>2021-05-08</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://yxudong.github.io/Redis-%E9%9D%A2%E8%AF%95%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%AD%EF%BC%89/</loc>
-    
-    <lastmod>2021-05-08</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://yxudong.github.io/Redis-%E9%9D%A2%E8%AF%95%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%8B%EF%BC%89/</loc>
     
     <lastmod>2021-05-08</lastmod>
     
@@ -165,7 +165,7 @@
 
   <url>
     <loc>https://yxudong.github.io/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -173,63 +173,63 @@
   
   <url>
     <loc>https://yxudong.github.io/tags/Python/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/tags/DS-A/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/tags/Kafka/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/tags/Redis/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/tags/Dijkstra/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/tags/OpenResty/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/tags/MySQL/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/tags/OpenResty%E7%B2%BE%E5%8D%8E%E6%95%B4%E7%90%86/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/tags/Redis%EF%BC%8C%E9%9D%A2%E8%AF%95/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -238,35 +238,35 @@
   
   <url>
     <loc>https://yxudong.github.io/categories/Python/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/categories/DS-A/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/categories/Kafka/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/categories/Redis/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://yxudong.github.io/categories/OpenResty/</loc>
-    <lastmod>2021-05-08</lastmod>
+    <lastmod>2021-05-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
